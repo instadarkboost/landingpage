@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Terceiros -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns/locale/pt-BR/cdn.min.js"></script>
+
+    <!-- Firebase SDKs (v9 Modular) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getDatabase, ref, onValue, push, set, remove, child, serverTimestamp, query, orderByChild } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyAZWFjOV4acklJrivmf1iIFNroeu1XLMvc",
+            authDomain: "terer-4831a.firebaseapp.com",
+            databaseURL: "https://terer-4831a-default-rtdb.firebaseio.com",
+            projectId: "terer-4831a",
+            storageBucket: "terer-4831a.firebasestorage.app",
+            messagingSenderId: "649179983995",
+            appId: "1:649179983995:web:11e5632ce9b9128a0f72de",
+            measurementId: "G-YV5WKP7FTL"
+        };
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        window.firebaseDb = { database, ref, onValue, push, set, remove, child, serverTimestamp, query, orderByChild };
+        window.firebaseReady = true;
+        document.dispatchEvent(new CustomEvent('firebaseReady'));
+    </script>
+
+    <title>Cosmic Portfolio Tracker</title> <!-- Thematic Title -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Switched to Inter and Orbitron -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌠</text></svg>"> <!-- Thematic Icon -->
+
+    <style>
+        :root {
+            --bg-color: #0D1117;
+            --text-color: #E0E0E0;
+            --card-bg: rgba(29, 29, 40, 0.75);
+            /* Use solid border for cards as border-image might be tricky to apply universally with variables alone */
+            --card-border-color: rgba(124, 58, 237, 0.3);
+            --card-hover-border-color: rgba(167, 139, 250, 0.6);
+
+            --header-bg: rgba(13, 17, 23, 0.85);
+            --input-bg: rgba(13, 17, 23, 0.8);
+            --input-border: rgba(124, 58, 237, 0.35);
+            --input-focus-border: #A78BFA;
+            --input-focus-shadow: rgba(167, 139, 250, 0.4);
+            --highlight-text: #fff;
+            --accent-gradient: linear-gradient(135deg, #A78BFA, #C4B5FD, #8B5CF6);
+            --positive-color: #34D399;
+            --negative-color: #F87171;
+            --neutral-color: #60A5FA;
+            --shadow-color: rgba(0, 0, 0, 0.45); /* Darker shadow for more depth */
+            --table-header-bg: rgba(40, 40, 55, 0.85);
+            --table-row-even-bg: rgba(29, 29, 40, 0.5); /* Adjusted to fit card bg */
+            --table-row-hover-bg: rgba(87, 83, 182, 0.4); /* Purple hover */
+            --button-primary-bg: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+            --button-primary-hover-bg: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);
+            --button-primary-shadow: rgba(107, 33, 168, 0.3);
+            --button-primary-hover-shadow: rgba(107, 33, 168, 0.4);
+            --scroll-bar-thumb: #A78BFA;
+            --scroll-bar-track: #1f2937;
+        }
+
+        body.light-theme { /* Keep light theme variables, adjust them if you want a light intergalactic theme */
+            --bg-color: #E9EBF8; /* Lighter spacey blue/purple */
+            --text-color: #1E293B; /* Darker text for contrast */
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border-color: rgba(124, 58, 237, 0.25);
+            --card-hover-border-color: rgba(167, 139, 250, 0.5);
+            --header-bg: rgba(224, 231, 255, 0.9); /* Lighter header */
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --input-border: rgba(124, 58, 237, 0.3);
+            --input-focus-border: #8B5CF6;
+            --input-focus-shadow: rgba(124, 58, 237, 0.3);
+            --highlight-text: #4F46E5; /* Darker purple for highlight */
+            --accent-gradient: linear-gradient(135deg, #8B5CF6, #A78BFA, #6366F1);
+            --shadow-color: rgba(107, 33, 168, 0.15);
+            --table-header-bg: rgba(209, 213, 237, 0.9);
+            --table-row-even-bg: rgba(233, 235, 248, 0.7);
+            --table-row-hover-bg: rgba(199, 210, 254, 0.8);
+            --button-primary-shadow: rgba(107, 33, 168, 0.2);
+            --button-primary-hover-shadow: rgba(107, 33, 168, 0.3);
+            --scroll-bar-thumb: #8B5CF6;
+            --scroll-bar-track: #D1D5DB;
+        }
+
+        /* Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif; /* THEMED FONT */
+            line-height: 1.65;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex; flex-direction: column; min-height: 100vh;
+            overflow-x: hidden; position: relative; padding-top: 80px; /* Adjusted for header */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--scroll-bar-track); }
+        ::-webkit-scrollbar-thumb { background: var(--scroll-bar-thumb); border-radius: 5px;}
+        ::-webkit-scrollbar-thumb:hover { background: var(--input-focus-border); }
+
+        /* Starry Sky Backdrop */
+        #starry-sky-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+            background-image:
+                radial-gradient(ellipse at center, rgba(30, 27, 75, 0.1) 0%, transparent 65%),
+                radial-gradient(ellipse at top left, rgba(80, 30, 70, 0.08) 0%, transparent 55%),
+                radial-gradient(ellipse at bottom right, rgba(20, 50, 90, 0.08) 0%, transparent 55%),
+                radial-gradient(circle at 10% 20%, rgba(210, 210, 255, 0.5) 0.5px, transparent 1px),
+                radial-gradient(circle at 30% 50%, rgba(190, 210, 255, 0.4) 0.5px, transparent 1px),
+                radial-gradient(circle at 70% 30%, rgba(220, 200, 255, 0.6) 0.5px, transparent 1px),
+                radial-gradient(circle at 90% 60%, rgba(200, 200, 255, 0.3) 0.5px, transparent 1px),
+                radial-gradient(circle at 50% 80%, rgba(220, 200, 255, 0.5) 0.5px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 50px 50px, 70px 70px, 60px 60px, 80px 80px, 90px 90px;
+            opacity: 0;
+            animation: subtleStarShine 30s infinite alternate ease-in-out, fadeInBg 2.5s 0.3s ease-out forwards;
+            pointer-events: none; will-change: opacity, transform;
+        }
+        body.light-theme #starry-sky-backdrop { animation: fadeOutBg 1s ease-out forwards; }
+        @keyframes subtleStarShine { 0% { opacity: 0.5; transform: scale(1.003) rotate(0.03deg); } 100% { opacity: 0.8; transform: scale(1) rotate(-0.03deg); } }
+        @keyframes fadeInBg { to { opacity: 0.75; } }
+        @keyframes fadeOutBg { to { opacity: 0; } }
+
+
+        header {
+            background-color: var(--header-bg); backdrop-filter: blur(10px) saturate(130%);
+            padding: 0.8rem 2rem; /* Adjusted padding */
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 20px var(--shadow-color); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            animation: slideDownSmooth 0.7s ease-out forwards; flex-wrap: wrap; gap: 1rem;
+            border-bottom: 1px solid var(--card-border-color);
+        }
+        header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700; font-size: 1.7em; margin-right: 1rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: textGradientShine 7s linear infinite alternate, logoGlow 3.5s infinite alternate ease-in-out;
+        }
+        .header-actions { display: flex; align-items: center; gap: 1.2rem; }
+        @keyframes logoGlow {
+            from { text-shadow: 0 0 7px rgba(220, 220, 255, 0.5), 0 0 12px var(--input-focus-border); filter: brightness(1.05); }
+            to { text-shadow: 0 0 12px rgba(230, 230, 255, 0.7), 0 0 20px var(--accent-gradient); filter: brightness(1.15); }
+        }
+        @keyframes textGradientShine { to { background-position: 200% center; } }
+        @keyframes slideDownSmooth { 0% { opacity: 0; transform: translateY(-100%); } 100% { opacity: 1; transform: translateY(0); } }
+
+        /* Theme Switch (Futuristic Toggle) */
+        .theme-switch-wrapper { display: flex; align-items: center; }
+        .theme-switch { display: inline-block; height: 22px; position: relative; width: 44px; }
+        .theme-switch input { display:none; }
+        .slider {
+            background-color: rgba(107, 114, 128, 0.5); /* Grayish for dark off */
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            bottom: 0; cursor: pointer; left: 0; right: 0; top: 0;
+            position: absolute; transition: .4s; border-radius: 22px;
+        }
+        .slider:before { /* The knob */
+            background-color: var(--text-color); bottom: 2px; content: ""; height: 16px; left: 3px;
+            position: absolute; transition: .4s; width: 16px; border-radius: 50%;
+        }
+        input:checked + .slider { background-image: var(--button-primary-bg); border-color: transparent; }
+        input:checked + .slider:before { transform: translateX(20px); background-color: #fff; }
+        body.light-theme .slider { background-color: #ccc; border-color: #bbb; }
+        body.light-theme input:checked + .slider { background-image: var(--button-primary-bg); }
+        body.light-theme .slider:before { background-color: var(--highlight-text); } /* Knob color for light theme off */
+
+
+        /* Total Counter (Futuristic Pill Style) */
+        .total-counter-container {
+            background: linear-gradient(145deg, rgba(124, 58, 237, 0.2), rgba(99, 102, 241, 0.15));
+            border: 1px solid var(--card-border-color); color: var(--text-color);
+            border-radius: 50px; font-weight: 500;
+            box-shadow: 0 0 18px rgba(124, 58, 237, 0.25), inset 0 0 8px rgba(124, 58, 237, 0.1);
+            white-space: nowrap; display: flex; flex-direction: column; cursor: pointer; overflow: hidden;
+            min-height: calc(1em + 1.2rem); max-height: calc(1em + 1.2rem); padding: 0;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); width: fit-content;
+        }
+        .total-counter-container:hover {
+            max-height: 300px; border-radius: 15px;
+            background: linear-gradient(145deg, rgba(124, 58, 237, 0.35), rgba(99, 102, 241, 0.3));
+            box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4), inset 0 0 12px rgba(167, 139, 250, 0.1);
+        }
+        .counter-main { display: flex; align-items: center; gap: 7px; padding: 0.6rem 1.3rem; line-height: 1em; }
+        .counter-main span:first-child { font-size: 0.85em; color: var(--text-color); opacity: 0.85; }
+        #valorPatrimonioAtual { font-family: 'Orbitron', sans-serif; font-size: 1.1em; font-weight: 600; color: var(--highlight-text); text-shadow: 0 0 7px rgba(192, 132, 252, 0.6); }
+        .counter-details {
+            padding: 0.9rem 1.3rem 0.7rem; margin-top: 0.4rem; border-top: 1px solid var(--card-border-color); opacity: 0;
+            transform: translateY(-7px) scaleY(0.98); transform-origin: top center;
+            transition: opacity 0.3s ease-out 0.1s, transform 0.3s ease-out 0.1s; pointer-events: none;
+        }
+        .total-counter-container:hover .counter-details { opacity: 1; transform: translateY(0) scaleY(1); pointer-events: auto; }
+        .counter-details p { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; font-size: 0.8em; }
+        .counter-details span:first-child { color: var(--text-color); opacity:0.8; margin-right: 8px; }
+        .counter-details span:last-child { font-weight: 500; text-align: right; }
+        #valorPicoPatrimonio { color: var(--positive-color); } #dataPicoPatrimonio { color: var(--neutral-color); }
+        #ultimaVariacao.status-positivo { color: var(--positive-color); }
+        #ultimaVariacao.status-negativo { color: var(--negative-color); }
+
+
+        main { flex: 1; padding: 2rem 1.5rem; display: flex; flex-direction: column; align-items: center; animation: fadeIn 0.8s ease-out; z-index: 1; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Section Cards (FinançApp Content Card Style) */
+        .section-card {
+            background-color: var(--card-bg); backdrop-filter: blur(10px) saturate(120%);
+            padding: 1.8rem 2.2rem; border-radius: 0.75rem; /* Consistent radius */
+            box-shadow: 0 8px 30px var(--shadow-color), inset 0 0 8px rgba(167, 139, 250, 0.04);
+            border: 1px solid var(--card-border-color);
+            width: 100%; max-width: 1200px; margin: 0 auto 2rem auto;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s ease-out;
+            opacity: 0; animation: popInSmooth 0.6s ease-out forwards;
+        }
+        .section-card:nth-child(2) { animation-delay: 0.08s; } .section-card:nth-child(3) { animation-delay: 0.16s; }
+        .section-card:nth-child(4) { animation-delay: 0.24s; } .section-card:nth-child(5) { animation-delay: 0.32s; }
+
+        @keyframes popInSmooth { 0% { opacity: 0; transform: translateY(25px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        .section-card:hover {
+            border-color: var(--card-hover-border-color);
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 12px 40px var(--shadow-color), 0 0 20px rgba(124, 58, 237, 0.15);
+        }
+        .section-card h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--highlight-text); margin-bottom: 1.5rem; text-align: center; font-weight: 600; font-size: 1.8em;
+            position: relative; display: inline-block; left: 50%; transform: translateX(-50%); padding-bottom: 0.4rem;
+        }
+        /* Section Title Glow */
+        .section-card h2::after {
+            content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
+            width: 55%; height: 2.5px;
+            background: linear-gradient(90deg, transparent, var(--input-focus-border), var(--positive-color), transparent);
+            border-radius: 2px; opacity: 0.65;
+            transition: opacity 0.35s ease-in-out, width 0.35s ease-in-out;
+        }
+        .section-card:hover h2::after { width: 75%; opacity: 0.85; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem; align-items: flex-end; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 0.3rem; font-weight: 500; font-size: 0.8em; color: var(--text-color); opacity: 0.85; }
+        .form-group input[type="text"], .form-group input[type="number"], .form-group input[type="date"] {
+            background-color: var(--input-bg); border: 1px solid var(--input-border); border-radius: 0.5rem;
+            padding: 0.6rem 0.9rem; color: var(--text-color); font-family: 'Inter', sans-serif; font-size: 0.9em;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        .form-group input::placeholder { color: var(--text-color); opacity: 0.5; }
+        .form-group input:focus { outline: none; border-color: var(--input-focus-border); box-shadow: 0 0 0 2.5px var(--input-focus-shadow); }
+        #addEntryForm button[type="submit"] { grid-column: 1 / -1; }
+
+        /* App Button (FinançApp Style) */
+        .app-button {
+            border: none; padding: 0.7rem 1.6rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;
+            font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px;
+            background-image: var(--button-primary-bg); color: white;
+            display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+            width: fit-content; margin: 0.8rem auto 0 auto;
+            box-shadow: 0 4px 12px var(--button-primary-shadow), 0 1px 2px rgba(0,0,0,0.15);
+            position: relative; overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .app-button::before { /* Hover glow */
+            content: ""; position: absolute; top: 50%; left: 50%; width: 300%; height: 300%;
+            background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 55%);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.35s ease-out, opacity 0.35s ease-out; opacity: 0; border-radius: 50%;
+        }
+        .app-button:hover {
+            background-image: var(--button-primary-hover-bg);
+            transform: translateY(-2.5px) scale(1.02);
+            box-shadow: 0 7px 20px var(--button-primary-hover-shadow), 0 2.5px 7px rgba(0,0,0,0.2);
+        }
+        .app-button:hover::before { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        .app-button:active {
+            transform: translateY(-1px) scale(0.98); box-shadow: 0 2px 7px var(--button-primary-shadow);
+        }
+        .app-button .icon { font-size: 1em; }
+
+        .table-action-button {
+            border: none; background: transparent; cursor: pointer; padding: 0.4rem;
+            font-size: 1em; transition: transform 0.2s ease, color 0.2s ease;
+        }
+        .table-action-button.edit-btn { color: var(--neutral-color); }
+        .table-action-button.edit-btn:hover { color: var(--input-focus-border); transform: scale(1.15); }
+        .table-action-button.delete-btn { color: var(--negative-color); }
+        .table-action-button.delete-btn:hover { color: #f43f5e; transform: scale(1.15); }
+
+        /* Summary Widgets (Styled as mini content-cards) */
+        .summary-widgets-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 1.2rem; }
+        .summary-widget {
+            background: linear-gradient(145deg, rgba(40, 40, 60, 0.8), rgba(25, 25, 40, 0.85));
+            padding: 1.2rem; border-radius: 0.6rem;
+            border: 1px solid var(--card-border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25); text-align: center;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .summary-widget:hover {
+            transform: translateY(-4px) scale(1.015);
+            box-shadow: 0 7px 22px var(--shadow-color);
+            border-color: var(--card-hover-border-color);
+        }
+        .widget-title { font-family: 'Orbitron', sans-serif; font-weight: 500; font-size: 0.8em; color: var(--text-color); opacity: 0.75; margin-bottom: 0.6rem; text-transform: uppercase; }
+        .widget-value { font-family: 'Orbitron', sans-serif; font-size: 1.5em; font-weight: 600; color: var(--highlight-text); margin-bottom: 0.15rem; line-height: 1.15; }
+        .widget-sub-value { font-size: 0.8em; color: var(--text-color); opacity: 0.65; }
+        .widget-value.positive { color: var(--positive-color); text-shadow: 0 0 5px var(--positive-color); }
+        .widget-value.negative { color: var(--negative-color); text-shadow: 0 0 5px var(--negative-color); }
+
+        /* Charts Grid and Boxes (Styled as content-cards) */
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.8rem; }
+        .chart-box {
+            background: linear-gradient(150deg, rgba(29, 29, 40, 0.7), rgba(20, 20, 30, 0.75)); /* Slightly different from main card */
+            padding: 1.2rem; border-radius: 0.6rem;
+            border: 1px solid var(--card-border-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.28); display: flex; flex-direction: column;
+        }
+        .chart-box h3 {
+            font-family: 'Orbitron', sans-serif; font-size: 1em; font-weight: 500; text-align: center; margin-bottom: 1rem;
+            color: var(--text-color); opacity: 0.85;
+        }
+        .chart-wrapper { position: relative; width: 100%; flex-grow: 1; min-height: 260px; display: flex; justify-content: center; align-items: center; }
+        .chart-wrapper canvas { max-width: 100%; max-height: 380px; }
+        .chart-placeholder { color: var(--text-color); opacity: 0.6; font-style: italic; text-align: center; font-size: 0.95em; }
+
+        /* Table */
+        .table-controls { display: flex; gap: 0.8rem; margin-bottom: 1.2rem; align-items: center; flex-wrap: wrap;}
+        .table-controls label { font-size: 0.8em; margin-right: 0.25rem; color: var(--text-color); opacity: 0.8; }
+        .table-controls select {
+            background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-color);
+            padding: 0.4rem 0.7rem; border-radius: 0.4rem; font-family: 'Inter', sans-serif; font-size: 0.85em;
+        }
+        .table-controls select:focus { outline: none; border-color: var(--input-focus-border); box-shadow: 0 0 0 2px var(--input-focus-shadow); }
+        table {
+            width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 0.8rem; background-color: var(--card-bg);
+            border-radius: 0.6rem; overflow: hidden; box-shadow: 0 7px 22px rgba(0,0,0,0.2); border: 1px solid var(--input-border);
+        }
+        th, td { padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--input-border); vertical-align: middle; font-size: 0.82em; }
+        th {
+            background-color: var(--table-header-bg); color: var(--input-focus-border); /* Themed header text */
+            font-weight: 600; text-align: left;
+            cursor: pointer; transition: background-color 0.2s ease; white-space: nowrap;
+        }
+        th:hover { background-color: var(--table-row-hover-bg); }
+        th .sort-arrow { margin-left: 4px; opacity: 0.7; font-size: 0.75em; display: inline-block; width: 8px; text-align: center;}
+        td { color: var(--text-color); }
+        tbody tr:nth-child(even) { background-color: var(--table-row-even-bg); }
+        tbody tr:hover { background-color: var(--table-row-hover-bg); }
+        tbody tr:last-child td { border-bottom: none; }
+        td.status-positivo { color: var(--positive-color); font-weight: 500; }
+        td.status-negativo { color: var(--negative-color); font-weight: 500; }
+        /* Column widths as before, or adjust as needed */
+        col.col-date { width: 13%; } col.col-comment { width: 35%; } col.col-value { width: 18%; }
+        col.col-change { width: 18%; } col.col-actions { width: 16%; }
+        td[data-label$="(R$)"] { text-align: right; font-variant-numeric: tabular-nums; }
+
+
+        /* Modal (Themed like FinançApp Modal) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(13, 17, 23, 0.75); /* Dark overlay */
+            backdrop-filter: blur(5px) saturate(110%);
+            display: flex; justify-content: center; align-items: center; z-index: 2000;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; transition-delay: 0s; }
+        .modal-container {
+            background: linear-gradient(145deg, rgba(40, 40, 60, 0.97), rgba(25, 25, 40, 0.97));
+            border: 1px solid var(--card-hover-border-color);
+            padding: 1.8rem 2.2rem; border-radius: 0.6rem;
+            box-shadow: 0 7px 30px var(--shadow-color);
+            text-align: left; color: var(--text-color);
+            max-width: 580px; width: 90%;
+            transform: scale(0.9) translateY(15px); opacity: 0;
+            transition: transform 0.35s ease-out, opacity 0.35s ease-out;
+        }
+        .modal-overlay.active .modal-container { transform: scale(1) translateY(0); opacity: 1; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+        .modal-title { font-family: 'Orbitron', sans-serif; font-size: 1.3em; font-weight: 600; color: var(--highlight-text); }
+        .close-modal-btn { background: none; border: none; font-size: 1.6em; color: var(--text-color); cursor: pointer; opacity:0.65; transition: opacity 0.2s, transform 0.2s; }
+        .close-modal-btn:hover { opacity:1; transform: rotate(90deg); }
+        .modal-container .form-grid { grid-template-columns: 1fr; } /* Modal form layout */
+        .modal-actions { display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.2rem; }
+        /* Modal buttons will use .app-button styles, specific cancel button if needed */
+        #cancelEditBtn {
+            background-image: none;
+            background-color: rgba(107, 114, 128, 0.25); /* Grayish cancel */
+            border: 1px solid rgba(107, 114, 128, 0.4);
+            color: var(--text-color);
+        }
+        #cancelEditBtn:hover {
+            background-color: rgba(107, 114, 128, 0.4);
+            border-color: rgba(107, 114, 128, 0.6);
+        }
+
+
+        /* Footer (Themed like FinançApp) */
+        .site-footer {
+            background: linear-gradient(180deg, var(--bg-color) 0%, #0A0D11DD 100%);
+            padding: 1.2rem 0; margin-top: auto; color: var(--text-color); opacity:0.65;
+            font-size: 0.82em; border-top: 1px solid var(--card-border-color);
+            text-align: center; z-index: 1; position: relative;
+        }
+        body.light-theme .site-footer { background: linear-gradient(180deg, var(--bg-color) 0%, rgba(224, 231, 255, 0.7) 100%);}
+        .site-footer::before { /* FinançApp footer line style */
+            content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+            width: 45px; height: 2px;
+            background: linear-gradient(90deg, var(--input-focus-border), var(--positive-color));
+            border-radius: 1px; box-shadow: 0 0 5px var(--input-focus-shadow);
+            animation: footerLinePulse 2.8s infinite alternate ease-in-out;
+        }
+        @keyframes footerLinePulse {
+            from { width: 40px; opacity: 0.55; box-shadow: 0 0 4px var(--input-focus-shadow); }
+            to { width: 60px; opacity: 0.85; box-shadow: 0 0 9px var(--input-focus-shadow); }
+        }
+        .site-footer p span { color: var(--positive-color); font-weight: 500; } /* For the heart */
+
+
+        /* Responsive adjustments (keep existing, may need minor tweaks if layout breaks) */
+        @media (max-width: 1024px) {
+            header { padding: 0.8rem 1.2rem; } .section-card { padding: 1.5rem 1.8rem; }
+            .section-card h2 { font-size: 1.6em; } .form-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            body { padding-top: 0px; }
+            header { position: static; flex-direction: column; padding-bottom: 0.8rem; gap: 0.6rem;}
+            .header-actions { justify-content: space-around; width:100%; padding: 0 0.5rem; }
+            main { padding: 1.2rem 0.8rem; } .section-card { padding: 1.2rem; border-radius: 0.6rem; margin-bottom: 1.8rem;}
+            .section-card h2 { font-size: 1.45em; margin-bottom: 1rem; }
+            th, td { padding: 0.6rem 0.4rem; font-size: 0.78em; }
+            .charts-grid { grid-template-columns: 1fr; } .chart-wrapper { min-height: 230px; }
+            .table-controls { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+        }
+        @media (max-width: 480px) {
+            header h1 { font-size: 1.3em; } .section-card h2 { font-size: 1.3em; }
+            th, td { font-size: 0.72em; }
+            .app-button { font-size: 0.8em; padding: 0.6rem 1.3rem; }
+            .modal-container { padding: 1.2rem; } .modal-title { font-size: 1.2em; }
+            .summary-widgets-container { grid-template-columns: 1fr; gap: 1rem; }
+            .widget-value { font-size: 1.3em;}
+            .chart-box h3 { font-size: 0.9em;}
+            .chart-wrapper { min-height: 200px;}
+            .theme-switch { width: 40px; height: 20px;} .slider:before {width: 14px; height:14px; left:3px;bottom:2px;} input:checked + .slider:before {transform: translateX(18px);}
+        }
+
+    </style>
+</head>
+<body class="dark-theme"> <!-- Default to dark theme -->
+    <div id="starry-sky-backdrop"></div> <!-- Starry background element -->
+
+    <header>
+      <h1 class="font-orbitron">Cosmic Portfolio</h1> <!-- Thematic Name -->
+      <div class="header-actions">
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="themeToggleCheckbox" title="Alternar Tema Luz/Escuridão Cósmica">
+                <input type="checkbox" id="themeToggleCheckbox">
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <div class="total-counter-wrapper">
+            <div class="total-counter-container">
+                <div class="counter-main">
+                    <span>Valor da Nave:</span> <!-- Thematic Text -->
+                    <span id="valorPatrimonioAtual">R$ 0,00</span>
+                </div>
+                <div class="counter-details">
+                    <p><span>Flutuação Recente:</span> <span id="ultimaVariacao" class="">R$ 0,00</span></p>
+                    <p><span>Pico de Energia:</span> <span id="valorPicoPatrimonio">R$ 0,00</span></p>
+                    <p><span>Data do Pico:</span> <span id="dataPicoPatrimonio">--/--/----</span></p>
+                </div>
+            </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+        <section class="section-card form-section">
+            <h2><span class="icon">🛰️</span> Registrar Nova Anomalia Financeira</h2>
+            <form id="addEntryForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="entryDate">Data Estelar:</label>
+                        <input type="date" id="entryDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="entryComment">Log da Missão:</label>
+                        <input type="text" id="entryComment" placeholder="Ex: Coleta de Asteróides, Salário da Frota..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="entryValue">Valor Total da Carga (R$):</label>
+                        <input type="number" id="entryValue" step="0.01" placeholder="Ex: 9500.50" required>
+                    </div>
+                </div>
+                <button type="submit" class="app-button"><span class="icon">➕</span>Registrar no Diário de Bordo</button>
+            </form>
+        </section>
+
+        <section class="section-card summary-section">
+            <h2><span class="icon">✨</span> Síntese Cósmica</h2>
+            <div class="summary-widgets-container">
+                <div class="summary-widget">
+                    <div class="widget-title">Apogeu da Fortuna</div>
+                    <div id="widgetValorPico" class="widget-value">R$ 0,00</div>
+                    <div id="widgetDataPico" class="widget-sub-value">--/--/----</div>
+                </div>
+                 <div class="summary-widget">
+                    <div class="widget-title">Expansão (Marte-25 Ciclos)</div>
+                    <div id="widgetCrescMar" class="widget-value positive">R$ 0,00</div>
+                    <div class="widget-sub-value">(Dados de telemetria)</div>
+                </div>
+                 <div class="summary-widget">
+                    <div class="widget-title">Expansão (Andrômeda-25 Ciclos)</div>
+                    <div id="widgetCrescAbr" class="widget-value positive">R$ 0,00</div>
+                     <div class="widget-sub-value">(Dados de telemetria)</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-card chart-section">
+            <h2><span class="icon">🌌</span> Trajetória Intergaláctica do Portfólio</h2>
+            <div class="chart-box">
+                <div class="chart-wrapper">
+                   <canvas id="patrimonyHistoryChart"></canvas>
+                    <p id="patrimonyHistoryPlaceholder" class="chart-placeholder">Mapeando curso estelar...</p>
+               </div>
+           </div>
+       </section>
+
+       <section class="section-card additional-charts-section">
+            <h2><span class="icon">🔭</span> Scanners de Análise Profunda</h2>
+            <div class="charts-grid">
+                <div class="chart-box">
+                    <h3>Pulso de Crescimento Mensal</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="monthlyGrowthChart"></canvas>
+                        <p id="monthlyGrowthPlaceholder" class="chart-placeholder">Calculando ciclos...</p>
+                    </div>
+                </div>
+                <div class="chart-box">
+                    <h3>Análise Espectral de Comentários</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="commentAnalysisChart"></canvas>
+                        <p id="commentAnalysisPlaceholder" class="chart-placeholder">Decodificando sinais...</p>
+                    </div>
+                </div>
+            </div>
+       </section>
+
+        <section class="section-card data-section">
+            <h2><span class="icon">📜</span> Arquivos da Frota (Histórico Detalhado)</h2>
+            <div class="table-controls">
+                <label for="filterMonth">Mês Galáctico:</label>
+                <select id="filterMonth">
+                    <option value="all">Todos</option>
+                </select>
+                <label for="filterYear">Ano Estelar:</label>
+                <select id="filterYear">
+                    <option value="all">Todos</option>
+                </select>
+            </div>
+            <table>
+               <colgroup>
+                  <col class="col-date"> <col class="col-comment"> <col class="col-value"> <col class="col-change"> <col class="col-actions">
+                </colgroup>
+               <thead>
+                   <tr>
+                       <th data-sort-key="date">Data Estelar <span class="sort-arrow"></span></th>
+                       <th data-sort-key="comment">Log da Missão <span class="sort-arrow"></span></th>
+                       <th data-sort-key="value">Valor Carga (R$) <span class="sort-arrow"></span></th>
+                       <th data-sort-key="change">Variação Orbital (R$) <span class="sort-arrow"></span></th>
+                       <th>Comandos da Ponte</th>
+                    </tr>
+               </thead>
+               <tbody id="historyTableBody"></tbody>
+           </table>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2024 Cosmic Portfolio Tracker. Forjado nas estrelas com <span style="color: var(--positive-color);">✧</span> e JavaScript Quântico.</p>
+    </footer>
+
+    <div id="editEntryModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">⚙️ Ajustar Coordenadas do Registro</h3>
+                <button id="closeEditModalBtn" class="close-modal-btn" title="Fechar Transmissão">×</button>
+            </div>
+            <form id="editEntryForm">
+                <input type="hidden" id="editEntryId">
+                <div class="form-grid">
+                     <div class="form-group">
+                        <label for="editDate">Nova Data Estelar:</label>
+                        <input type="date" id="editDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editComment">Atualizar Log da Missão:</label>
+                        <input type="text" id="editComment" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editValue">Novo Valor da Carga (R$):</label>
+                        <input type="number" id="editValue" step="0.01" required>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancelEditBtn" class="app-button" style="background:transparent; border: 1px solid var(--neutral-color); color: var(--neutral-color);">Cancelar Ajustes</button>
+                    <button type="submit" class="app-button"><span class="icon">💾</span>Confirmar Novas Coordenadas</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+    // ===================================================================================
+    // COSMIC PORTFOLIO TRACKER - SCRIPT PRINCIPAL com Firebase
+    // ===================================================================================
+    document.addEventListener('firebaseReady', () => {
+        const { database, ref, onValue, push, set, remove, child, query, orderByChild } = window.firebaseDb;
+        const DB_PATH = 'patrimonioRegistros';
+
+        const LOCAL_STORAGE_KEY_THEME = 'cosmicPortfolioTheme_vFirebase';
+        let patrimonyDataMaster = [];
+        let processedAndSortedData = [];
+        let filteredAndSortedDataForTable = [];
+        let currentSort = { key: 'date', direction: 'desc' };
+
+        let historyChartInstance, monthlyGrowthChartInstance, commentAnalysisChartInstance;
+
+        const MONTHLY_GROWTH_FIXED = { MARCO_2025: 857.19, ABRIL_2025: 837.96 };
+        const COMMENT_KEYWORDS = ['salário', 'juros', 'aporte', 'bônus', 'gasto', 'resgate', 'investimento', 'receita', 'despesa']; // Thematic keywords
+        const CHART_COLORS_DARK = ['#A78BFA','#60A5FA','#34D399','#FBBF24','#F87171','#EC4899','#8B5CF6','#3B82F6','#10B981','#F59E0B'];
+        const CHART_COLORS_LIGHT = ['#8B5CF6','#3B82F6','#10B981','#F59E0B','#EF4444','#DB2777','#7C3AED','#2563EB','#059669','#D97706'];
+
+
+        const getElement = (id) => document.getElementById(id);
+        const addEvt = (el, evt, fn) => el && el.addEventListener(evt, fn);
+
+        const addEntryFormEl = getElement('addEntryForm');
+        const historyTableBodyEl = getElement('historyTableBody');
+        const valorPatrimonioAtualEl = getElement('valorPatrimonioAtual');
+        const ultimaVariacaoEl = getElement('ultimaVariacao');
+        const valorPicoPatrimonioEl = getElement('valorPicoPatrimonio');
+        const dataPicoPatrimonioEl = getElement('dataPicoPatrimonio');
+        const widgetValorPicoEl = getElement('widgetValorPico');
+        const widgetDataPicoEl = getElement('widgetDataPico');
+        const widgetCrescMarEl = getElement('widgetCrescMar');
+        const widgetCrescAbrEl = getElement('widgetCrescAbr');
+        const themeToggleCheckboxEl = getElement('themeToggleCheckbox');
+        const filterMonthEl = getElement('filterMonth');
+        const filterYearEl = getElement('filterYear');
+        const editModalEl = getElement('editEntryModal');
+        const closeEditModalBtnEl = getElement('closeEditModalBtn');
+        const cancelEditBtnEl = getElement('cancelEditBtn');
+        const editEntryFormEl = getElement('editEntryForm');
+        const editEntryIdInputEl = getElement('editEntryId');
+        const editDateInputEl = getElement('editDate');
+        const editCommentInputEl = getElement('editComment');
+        const editValueInputEl = getElement('editValue');
+
+        const formatCurrency = (v) => typeof v === 'number' ? v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ --,--';
+        const formatDateToDisplay = (d) => d instanceof Date && !isNaN(d) ? dateFns.format(d, 'dd/MM/yyyy', {locale: dateFns.locale.ptBR}) : '--/--/----';
+        const formatDateToInput = (d) => d instanceof Date && !isNaN(d) ? dateFns.format(d, 'yyyy-MM-dd') : '';
+        const parseDateFromInput = (dateStr) => {
+            if (!dateStr) return null;
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return null;
+            const [year, month, day] = parts.map(Number);
+            if (isNaN(year) || isNaN(month) || isNaN(day) || month < 1 || month > 12 || day < 1 || day > 31) return null;
+            return new Date(Date.UTC(year, month - 1, day));
+        };
+        const parseDateFromRaw = (dateStrParse) => { // Handles "dd/Mmm/yyyy"
+            if (!dateStrParse) return null;
+            try {
+                // Example: "01/Jan/2023"
+                // We need to map month abbreviation to number
+                const monthMap = { jan:0, fev:1, mar:2, abr:3, mai:4, jun:5, jul:6, ago:7, set:8, out:9, nov:10, dez:11 };
+                const parts = dateStrParse.split('/');
+                if (parts.length !== 3) return null;
+                const day = parseInt(parts[0], 10);
+                const monthAbbr = parts[1].toLowerCase();
+                const year = parseInt(parts[2], 10);
+                const month = monthMap[monthAbbr];
+
+                if (isNaN(day) || month === undefined || isNaN(year)) return null;
+                return new Date(Date.UTC(year, month, day));
+            } catch (e) {
+                console.warn("Failed to parse raw date:", dateStrParse, e);
+                return null;
+            }
+        };
+
+
+        function applyTheme(theme) {
+            document.body.className = theme;
+            localStorage.setItem(LOCAL_STORAGE_KEY_THEME, theme);
+            if(themeToggleCheckboxEl) themeToggleCheckboxEl.checked = (theme === 'light-theme');
+            renderAllCharts();
+        }
+        const toggleTheme = () => applyTheme(document.body.classList.contains('dark-theme') ? 'light-theme' : 'dark-theme');
+
+        function processAndSortData(dataArray) {
+            if (!dataArray || dataArray.length === 0) return [];
+            let sorted = [...dataArray].sort((a, b) => a.date.getTime() - b.date.getTime());
+            return sorted.map((item, index, arr) => {
+                const change = (index > 0) ? (item.value - arr[index-1].value) : item.value; // Change for first item is its own value relative to 0
+                return { ...item, change, isPositive: change >= 0 };
+            });
+        }
+
+        function applyFiltersAndSort() {
+            const selectedMonth = filterMonthEl.value;
+            const selectedYear = filterYearEl.value;
+            filteredAndSortedDataForTable = processedAndSortedData.filter(item => {
+                if (!(item.date instanceof Date && !isNaN(item.date))) return false;
+                const itemMonth = item.date.getUTCMonth().toString();
+                const itemYear = item.date.getUTCFullYear().toString();
+                const monthMatch = (selectedMonth === "all" || itemMonth === selectedMonth);
+                const yearMatch = (selectedYear === "all" || itemYear === selectedYear);
+                return monthMatch && yearMatch;
+            });
+            const { key, direction } = currentSort;
+            filteredAndSortedDataForTable.sort((a, b) => {
+                let valA = a[key], valB = b[key];
+                if (key === 'date') { valA = a.date.getTime(); valB = b.date.getTime(); }
+                else if (typeof valA === 'string') { valA = valA.toLowerCase(); valB = valB.toLowerCase(); }
+                if (valA < valB) return direction === 'asc' ? -1 : 1;
+                if (valA > valB) return direction === 'asc' ? 1 : -1;
+                return a.date.getTime() - b.date.getTime();
+            });
+            renderTable();
+            updateSortArrowsUI();
+        }
+
+        async function addEntryToFirebase(entryData) {
+            try {
+                const newEntryRef = push(ref(database, DB_PATH));
+                await set(newEntryRef, {
+                    ...entryData,
+                    date: entryData.date.toISOString(),
+                    createdAt: dateFns.formatISO(new Date())
+                });
+            } catch (error) { console.error("Erro ao adicionar ao Firebase:", error); alert("Falha ao salvar dados."); }
+        }
+        async function updateEntryInFirebase(entryId, entryData) {
+            try {
+                await set(ref(database, `${DB_PATH}/${entryId}`), {
+                    ...entryData,
+                    date: entryData.date.toISOString(),
+                    updatedAt: dateFns.formatISO(new Date())
+                });
+            } catch (error) { console.error("Erro ao atualizar no Firebase:", error); alert("Falha ao atualizar."); }
+        }
+        async function deleteEntryFromFirebase(entryId) {
+            try { await remove(ref(database, `${DB_PATH}/${entryId}`));
+            } catch (error) { console.error("Erro ao excluir do Firebase:", error); alert("Falha ao excluir.");}
+        }
+
+        function listenToFirebaseData() {
+            const dataQuery = query(ref(database, DB_PATH), orderByChild('date'));
+            onValue(dataQuery, (snapshot) => {
+                const firebaseData = snapshot.val();
+                if (firebaseData) {
+                    patrimonyDataMaster = Object.keys(firebaseData).map(key => ({
+                        id: key, ...firebaseData[key],
+                        date: new Date(firebaseData[key].date) // Firebase stores date as ISO string, convert back to Date object
+                    }));
+                    fullUpdateLocalState();
+                } else {
+                    patrimonyDataMaster = []; // No data in Firebase
+                    fullUpdateLocalState(); // Still update UI to show empty state
+                }
+            }, (error) => {
+                console.error("Erro ao ouvir dados do Firebase:", error);
+                alert("Erro ao carregar dados. Verifique sua conexão e as regras do Firebase.");
+                if (historyTableBodyEl) historyTableBodyEl.innerHTML = `<tr><td colspan="5" style="color:var(--negative-color);text-align:center;">Falha ao carregar dados da base estelar.</td></tr>`;
+            });
+        }
+
+        function fullUpdateLocalState() {
+            processedAndSortedData = processAndSortData(patrimonyDataMaster);
+            populateFilterDropdowns();
+            applyFiltersAndSort();
+            renderStaticSummaries();
+            renderAllCharts();
+        }
+
+        function renderStaticSummaries() {
+            if(widgetCrescMarEl) widgetCrescMarEl.textContent = formatCurrency(MONTHLY_GROWTH_FIXED.MARCO_2025);
+            if(widgetCrescAbrEl) widgetCrescAbrEl.textContent = formatCurrency(MONTHLY_GROWTH_FIXED.ABRIL_2025);
+            if (!processedAndSortedData || processedAndSortedData.length === 0) {
+                const zero = formatCurrency(0); const na = '--/--/----';
+                [valorPatrimonioAtualEl, ultimaVariacaoEl, valorPicoPatrimonioEl, widgetValorPicoEl].forEach(el => el && (el.textContent = zero));
+                [dataPicoPatrimonioEl, widgetDataPicoEl].forEach(el => el && (el.textContent = na));
+                if(ultimaVariacaoEl) ultimaVariacaoEl.className=''; return;
+            }
+            const peak = processedAndSortedData.reduce((m,c)=>(c.value > m.value ? c : m), processedAndSortedData[0]);
+            const latest = processedAndSortedData[processedAndSortedData.length-1];
+            if(valorPatrimonioAtualEl) valorPatrimonioAtualEl.textContent=formatCurrency(latest.value);
+            if(ultimaVariacaoEl) { ultimaVariacaoEl.textContent=formatCurrency(latest.change); ultimaVariacaoEl.className = latest.isPositive?'status-positivo':(latest.change!==0?'status-negativo':''); }
+            if(valorPicoPatrimonioEl) valorPicoPatrimonioEl.textContent=formatCurrency(peak.value);
+            if(dataPicoPatrimonioEl) dataPicoPatrimonioEl.textContent=formatDateToDisplay(peak.date);
+            if(widgetValorPicoEl) widgetValorPicoEl.textContent=formatCurrency(peak.value);
+            if(widgetDataPicoEl) widgetDataPicoEl.textContent=formatDateToDisplay(peak.date);
+        }
+        function renderTable() {
+            if (!historyTableBodyEl) return; historyTableBodyEl.innerHTML = '';
+            const data = filteredAndSortedDataForTable;
+            if(data.length === 0){ historyTableBodyEl.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:1.5rem; color: var(--text-color); opacity: 0.7;">${(patrimonyDataMaster.length===0)?'Nenhum registro na galáxia.':'Nenhum registro para os filtros selecionados.'}</td></tr>`; return;}
+            data.forEach((item)=>{
+                const row = historyTableBodyEl.insertRow();
+                const firstOverall = processedAndSortedData.findIndex(d=>d.id===item.id)===0;
+                const changeTxt=firstOverall?formatCurrency(item.value):formatCurrency(item.change); // For first, change is the value itself
+                const changeCls=firstOverall?'status-positivo':(item.isPositive?'status-positivo':(item.change!==0?'status-negativo':''));
+                row.innerHTML = `<td>${formatDateToDisplay(item.date)}</td><td>${item.comment}</td><td style="text-align:right;">${formatCurrency(item.value)}</td><td class="${changeCls}" style="text-align:right;">${changeTxt}</td><td><button class="table-action-button edit-btn" data-id="${item.id}" title="Editar Registro">⚙️</button><button class="table-action-button delete-btn" data-id="${item.id}" title="Deletar Registro">🗑️</button></td>`;
+                addEvt(row.querySelector('.edit-btn'), 'click', () => openEditModal(item.id));
+                addEvt(row.querySelector('.delete-btn'), 'click', () => handleDeleteEntry(item.id));
+            });
+        }
+
+        const getCSSVar = (name) => getComputedStyle(document.body).getPropertyValue(name).trim();
+        function renderAllCharts() {
+            const themeColors = {
+                textColor: getCSSVar('--text-color'),
+                gridColor: getCSSVar('--input-border'), // Or a lighter variant for grid
+                positiveColor: getCSSVar('--positive-color'),
+                negativeColor: getCSSVar('--negative-color'),
+                highlight: getCSSVar('--input-focus-border'), // Or another accent
+                cardBg: getCSSVar('--card-bg'),
+                chartPalette: document.body.classList.contains('light-theme') ? CHART_COLORS_LIGHT : CHART_COLORS_DARK
+            };
+            renderHistoryChart(themeColors);
+            renderMonthlyGrowthChart(themeColors);
+            renderCommentAnalysisChart(themeColors);
+        }
+
+        function renderHistoryChart({textColor, gridColor, positiveColor, highlight, cardBg, chartPalette}) {
+             const canvasEl = getElement('patrimonyHistoryChart'), ph = getElement('patrimonyHistoryPlaceholder'); if(!canvasEl || !ph) return;
+             const hasData = processedAndSortedData.length > 0; ph.style.display = hasData ? 'none' : 'block'; canvasEl.style.display = hasData ? 'block' : 'none';
+             if(!hasData){ if(historyChartInstance)historyChartInstance.destroy(); historyChartInstance = null; ph.textContent="Sem dados para exibir trajetória."; return; }
+             const dataPoints = processedAndSortedData.map(item=>({x:item.date.getTime(),y:item.value}));
+             const config = {type:'line',data:{datasets:[{label:'Patrimônio',data:dataPoints,borderColor:chartPalette[0],backgroundColor:Chart.helpers.color(chartPalette[0]).alpha(0.1).rgbString(),borderWidth:2,pointBackgroundColor:chartPalette[0],pointBorderColor:highlight,tension:0.15,fill:true,pointRadius:2.5,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{type:'time',adapters:{date:{locale:dateFns.locale.ptBR}},time:{unit:dataPoints.length>90?'month': (dataPoints.length > 30 ? 'week' : 'day'),tooltipFormat:'dd/MM/yyyy',displayFormats:{month:'MMM/yy',week:'dd/MM',day:'dd/MM'}},ticks:{color:textColor,font:{size:10}},grid:{color:gridColor}},y:{ticks:{color:textColor,font:{size:10},callback:(v)=>formatCurrency(v).replace('R$ ','')},grid:{color:gridColor}}},plugins:{legend:{display:false},tooltip:{backgroundColor:cardBg,titleColor:highlight,bodyColor:textColor,callbacks:{title:(i)=>i[0]?dateFns.format(i[0].parsed.x,'dd/MM/yyyy HH:mm', {locale: dateFns.locale.ptBR}):'',label:(ctx)=>`Patrimônio: ${formatCurrency(ctx.parsed.y)}`},padding:10,cornerRadius:4,bodyFont:{size:11}}},interaction:{mode:'index',intersect:false}}};
+             if(historyChartInstance)historyChartInstance.destroy();historyChartInstance=new Chart(canvasEl.getContext('2d'),config);
+        }
+        function renderMonthlyGrowthChart({textColor, gridColor, positiveColor, negativeColor, cardBg, chartPalette}) {
+             const canvasEl=getElement('monthlyGrowthChart'), ph=getElement('monthlyGrowthPlaceholder'); if(!canvasEl||!ph)return;
+             if(!processedAndSortedData || processedAndSortedData.length<1){ph.style.display='block';canvasEl.style.display='none';if(monthlyGrowthChartInstance)monthlyGrowthChartInstance.destroy();monthlyGrowthChartInstance=null;ph.textContent="Dados insuficientes para pulso.";return;}
+             const monthlyChanges={};let prevMonthEndVal=0;let firstMonthOverall=true;
+             processedAndSortedData.forEach(item=>{
+                const yearMonth=`${item.date.getUTCFullYear()}-${String(item.date.getUTCMonth()).padStart(2,'0')}`;
+                const monthName=dateFns.format(item.date,'MMM/yy',{locale:dateFns.locale.ptBR});
+                if(!monthlyChanges[yearMonth]){
+                    const startValThisMonth = firstMonthOverall && processedAndSortedData.length === 1 ? 0 : (firstMonthOverall ? item.value : prevMonthEndVal);
+                    monthlyChanges[yearMonth]={startValue:startValThisMonth, endValue:item.value, monthName};
+                    if(firstMonthOverall && processedAndSortedData.length > 1 && processedAndSortedData[0].id === item.id){
+                         // For the very first month with multiple entries, growth is relative to 0
+                        monthlyChanges[yearMonth].startValue = 0;
+                    }
+                    firstMonthOverall = false;
+                } else { monthlyChanges[yearMonth].endValue=item.value; }
+                prevMonthEndVal = item.value;
+             });
+             const labels=Object.values(monthlyChanges).map(m=>m.monthName);
+             const dataVals=Object.values(monthlyChanges).map(m=>(m.endValue-m.startValue));
+             const hasData = labels.length > 0; ph.style.display = hasData?'none':'block'; canvasEl.style.display = hasData?'block':'none';
+             if(!hasData){if(monthlyGrowthChartInstance)monthlyGrowthChartInstance.destroy();monthlyGrowthChartInstance=null;ph.textContent="Insuficiente.";return;}
+             const bgColors=dataVals.map(v=>v>=0?positiveColor:negativeColor);
+             const config={type:'bar',data:{labels,datasets:[{label:'Crescimento',data:dataVals,backgroundColor:bgColors,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'x',scales:{x:{ticks:{color:textColor,font:{size:10}},grid:{color:gridColor,drawOnChartArea:false}},y:{ticks:{color:textColor,font:{size:10},callback:(v)=>formatCurrency(v).replace('R$ ','')},grid:{color:gridColor}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:(ctx)=>`Crescimento: ${formatCurrency(ctx.parsed.y)}`},backgroundColor:cardBg,padding:10,cornerRadius:4,bodyFont:{size:11}}}}};
+             if(monthlyGrowthChartInstance)monthlyGrowthChartInstance.destroy();monthlyGrowthChartInstance=new Chart(canvasEl.getContext('2d'),config);
+        }
+        function renderCommentAnalysisChart({textColor, cardBg, chartPalette}) {
+             const canvasEl=getElement('commentAnalysisChart'), ph=getElement('commentAnalysisPlaceholder'); if(!canvasEl||!ph)return;
+             const counts={};COMMENT_KEYWORDS.forEach(k=>counts[k]=0);
+             processedAndSortedData.forEach(i=>{const c=i.comment.toLowerCase();COMMENT_KEYWORDS.forEach(k=>{if(c.includes(k))counts[k]++;});});
+             const labels=[], dataVals=[]; COMMENT_KEYWORDS.forEach(k=>{if(counts[k]>0){labels.push(k[0].toUpperCase()+k.slice(1));dataVals.push(counts[k]);}});
+             const hasData=dataVals.reduce((s,v)=>s+v,0)>0;ph.style.display=hasData?'none':'block';canvasEl.style.display=hasData?'block':'none';
+             if(!hasData){if(commentAnalysisChartInstance)commentAnalysisChartInstance.destroy();commentAnalysisChartInstance=null;ph.textContent="Nenhum sinal decodificado.";return;}
+             const bgColors = labels.map((_,i)=>chartPalette[i%chartPalette.length]);
+             const config={type:'doughnut',data:{labels,datasets:[{data:dataVals,backgroundColor:bgColors,borderColor:cardBg,borderWidth:1.5,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:textColor,padding:12,boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:(ctx)=>`${ctx.label}: ${ctx.parsed}`},backgroundColor:cardBg,padding:10,cornerRadius:4,bodyFont:{size:11}}}}};
+             if(commentAnalysisChartInstance)commentAnalysisChartInstance.destroy();commentAnalysisChartInstance=new Chart(canvasEl.getContext('2d'),config);
+        }
+
+
+        function populateFilterDropdowns() {
+            const years=new Set(); const months=Array.from({length:12},(_,i)=>({v:i.toString(),n:dateFns.format(new Date(Date.UTC(2000,i,1)),'MMMM',{locale:dateFns.locale.ptBR})}));
+            processedAndSortedData.forEach(item=>years.add(item.date.getUTCFullYear().toString()));
+            const curM=filterMonthEl.value, curY=filterYearEl.value;
+            filterMonthEl.innerHTML='<option value="all">Todos Meses</option>'+months.map(m=>`<option value="${m.v}">${m.n[0].toUpperCase()+m.n.slice(1)}</option>`).join('');
+            filterYearEl.innerHTML='<option value="all">Todos Anos</option>'+Array.from(years).sort((a,b)=>b-a).map(y=>`<option value="${y}">${y}</option>`).join('');
+            filterMonthEl.value= (curM && filterMonthEl.querySelector(`option[value="${curM}"]`)) ? curM : "all";
+            filterYearEl.value = (curY && filterYearEl.querySelector(`option[value="${curY}"]`)) ? curY : "all";
+        }
+        function updateSortArrowsUI() {
+            document.querySelectorAll('th[data-sort-key] .sort-arrow').forEach(a=>a.textContent='');
+            const active=document.querySelector(`th[data-sort-key="${currentSort.key}"] .sort-arrow`);
+            if(active)active.textContent = currentSort.direction === 'asc' ? '▲' : '▼';
+        }
+
+        function handleAddEntryFormSubmit(event) {
+            event.preventDefault();
+            const date = parseDateFromInput(getElement('entryDate').value);
+            const comment = getElement('entryComment').value.trim();
+            const value = parseFloat(getElement('entryValue').value);
+            if(!date||isNaN(date.getTime())||!comment||isNaN(value)||value<0){ alert("Dados inválidos. Verifique data, comentário e valor."); return;}
+            addEntryToFirebase({date, comment, value});
+            event.target.reset(); getElement('entryDate').focus();
+        }
+        const handleDeleteEntry = (id) => { if (confirm("Tem certeza que deseja apagar este registro da linha temporal?")) deleteEntryFromFirebase(id); }
+        function openEditModal(entryId) {
+            const entry=patrimonyDataMaster.find(i=>i.id===entryId); if(!entry)return;
+            editEntryIdInputEl.value=entry.id; editDateInputEl.value=formatDateToInput(entry.date);
+            editCommentInputEl.value=entry.comment; editValueInputEl.value=entry.value;
+            editModalEl.classList.add('active');
+        }
+        const closeEditModal = () => editModalEl.classList.remove('active');
+        function handleEditEntryFormSubmit(event) {
+            event.preventDefault();
+            const id=editEntryIdInputEl.value, date=parseDateFromInput(editDateInputEl.value),
+                  comment=editCommentInputEl.value.trim(), value=parseFloat(editValueInputEl.value);
+            if(!id||!date||isNaN(date.getTime())||!comment||isNaN(value)||value<0){alert("Dados inválidos para alteração."); return;}
+            updateEntryInFirebase(id, {date,comment,value});
+            closeEditModal();
+        }
+        function handleTableSort(event) {
+            const header=event.target.closest('th[data-sort-key]'); if(!header)return;
+            const key=header.dataset.sortKey;
+            if(currentSort.key===key) currentSort.direction=currentSort.direction==='asc'?'desc':'asc';
+            else{currentSort.key=key;currentSort.direction='desc';} // Default to desc for new column
+            applyFiltersAndSort();
+        }
+
+        function initializeApp() {
+            const savedTheme = localStorage.getItem(LOCAL_STORAGE_KEY_THEME) || 'dark-theme';
+            applyTheme(savedTheme);
+            listenToFirebaseData();
+            addEvt(addEntryFormEl, 'submit', handleAddEntryFormSubmit);
+            addEvt(themeToggleCheckboxEl, 'change', toggleTheme);
+            addEvt(filterMonthEl, 'change', applyFiltersAndSort);
+            addEvt(filterYearEl, 'change', applyFiltersAndSort);
+            addEvt(closeEditModalBtnEl, 'click', closeEditModal);
+            addEvt(cancelEditBtnEl, 'click', closeEditModal);
+            addEvt(editModalEl, 'click', (e) => { if (e.target === editModalEl) closeEditModal(); });
+            addEvt(editEntryFormEl, 'submit', handleEditEntryFormSubmit);
+            document.querySelectorAll('th[data-sort-key]').forEach(th => addEvt(th, 'click', handleTableSort));
+            console.log("Cosmic Portfolio Tracker inicializado!");
+        }
+        initializeApp();
+    });
+    </script>
+</body>
+</html>

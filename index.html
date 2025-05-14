@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/cdn.min.js"></script>
+    <title>FinançApp Cosmos - Gestor Estelar</title> <!-- Título temático -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Switched to Inter and Orbitron -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌌</text></svg>"> <!-- Icone temático -->
+
+    <style>
+        /* --- Reset & Base --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif; /* FINANCAPP FONT */
+            line-height: 1.65;
+            background-color: #0D1117; /* FINANCAPP DARK BG */
+            color: #E0E0E0; /* FINANCAPP LIGHT TEXT */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            padding-top: 90px; /* Espaço para header fixo */
+        }
+
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+
+        /* --- Starry Sky Backdrop (from FinançApp) --- */
+        #starry-sky-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+            background-image:
+                radial-gradient(ellipse at center, rgba(30, 27, 75, 0.12) 0%, transparent 70%),
+                radial-gradient(ellipse at top left, rgba(80, 30, 70, 0.1) 0%, transparent 60%),
+                radial-gradient(ellipse at bottom right, rgba(20, 50, 90, 0.1) 0%, transparent 60%),
+                radial-gradient(circle at 10% 20%, rgba(210, 210, 255, 0.6) 0.5px, transparent 1px),
+                radial-gradient(circle at 30% 50%, rgba(190, 210, 255, 0.5) 0.5px, transparent 1px),
+                radial-gradient(circle at 70% 30%, rgba(220, 200, 255, 0.7) 0.5px, transparent 1px),
+                radial-gradient(circle at 90% 60%, rgba(200, 200, 255, 0.4) 0.5px, transparent 1px),
+                radial-gradient(circle at 50% 80%, rgba(220, 200, 255, 0.6) 0.5px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 50px 50px, 70px 70px, 60px 60px, 80px 80px, 90px 90px;
+            opacity: 0; /* Will be faded in */
+            animation: subtleStarShine 35s infinite alternate ease-in-out, fadeInBg 3s 0.5s ease-out forwards;
+            pointer-events: none; will-change: opacity, transform;
+        }
+        @keyframes subtleStarShine { 0% { opacity: 0.6; transform: scale(1.005) rotate(0.05deg); } 100% { opacity: 0.9; transform: scale(1) rotate(-0.05deg); } }
+        @keyframes fadeInBg { to { opacity: 0.85; } }
+
+
+        /* --- Header (Adapted from FinançApp Navbar) --- */
+        header {
+            background-color: rgba(13, 17, 23, 0.85); /* Darker, less purple than original */
+            backdrop-filter: blur(10px) saturate(130%);
+            padding: 1rem 2.5rem; /* Adjusted padding */
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            animation: slideDownSmooth 0.8s ease-out forwards;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.25); /* Purple accent border */
+            transform-origin: top center;
+        }
+        header h1 { /* FinançApp Logo Style */
+            font-family: 'Orbitron', sans-serif;
+            color: #fff; font-weight: 700; font-size: 1.8em; /* Slightly smaller */
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5), 0 0 15px rgba(167, 139, 250, 0.4); /* Purple glow */
+            margin-right: 1.5rem;
+            background: linear-gradient(135deg, #A78BFA, #C4B5FD, #8B5CF6); /* Purple gradient */
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent; text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: textGradientShine 7s linear infinite alternate, logoGlow 3.5s infinite alternate ease-in-out;
+        }
+        @keyframes logoGlow { /* Adjusted glow */
+            from { text-shadow: 0 0 8px rgba(220, 220, 255, 0.6), 0 0 15px rgba(167, 139, 250, 0.5); filter: brightness(1.05); }
+            to { text-shadow: 0 0 15px rgba(230, 230, 255, 0.8), 0 0 25px rgba(192, 132, 252, 0.7); filter: brightness(1.2); }
+        }
+        @keyframes textGradientShine { to { background-position: 200% center; } }
+        @keyframes slideDownSmooth {
+            0% { opacity: 0; transform: translateY(-70px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Contador (Adapted "Futuristic Pill" Style) --- */
+        .total-counter-wrapper { position: fixed; top: 1rem; right: 2.5rem; z-index: 1001; }
+        .total-counter-container {
+            position: relative;
+            background: linear-gradient(145deg, rgba(124, 58, 237, 0.25), rgba(99, 102, 241, 0.2)); /* Subtle purple/blue gradient */
+            border: 1px solid rgba(167, 139, 250, 0.4); /* Purple border */
+            color: #E0E0E0; border-radius: 50px; /* Pill shape */
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.3), inset 0 0 10px rgba(124, 58, 237, 0.1);
+            white-space: nowrap; display: flex; flex-direction: column; align-items: stretch;
+            cursor: pointer; overflow: hidden;
+            min-height: calc(1.1em + 1.4rem); max-height: calc(1.1em + 1.4rem);
+            transition: max-height 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), border-radius 0.4s ease-in-out,
+                        box-shadow 0.4s ease, background 0.4s ease;
+            width: fit-content; padding: 0;
+        }
+        .total-counter-container:hover {
+            max-height: 500px; border-radius: 20px; /* Expands to a card */
+            background: linear-gradient(145deg, rgba(124, 58, 237, 0.4), rgba(99, 102, 241, 0.35));
+            box-shadow: 0 10px 35px rgba(124, 58, 237, 0.5), inset 0 0 15px rgba(167, 139, 250, 0.15);
+        }
+        .counter-main { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 0.7rem 1.5rem; flex-shrink: 0; line-height: 1.1em; }
+        .counter-main span:first-child { font-weight: 500; font-size: 0.9em; color: #C4B5FD; } /* Lighter purple */
+        #valorCirculacaoPrincipal { font-family: 'Orbitron', sans-serif; font-size: 1.2em; font-weight: 700; color: #fff; text-shadow: 0 0 8px rgba(192, 132, 252, 0.7); }
+        .counter-details {
+            width: 100%; padding: 1rem 1.5rem 0.8rem 1.5rem; margin-top: 0.6rem;
+            border-top: 1px solid rgba(167, 139, 250, 0.3);
+            opacity: 0; transform: translateY(-8px) scaleY(0.98);
+            transform-origin: top center;
+            transition: opacity 0.4s ease-out 0.1s, transform 0.4s ease-out 0.1s;
+            pointer-events: none;
+        }
+        .total-counter-container:hover .counter-details { opacity: 1; transform: translateY(0) scaleY(1); pointer-events: auto; }
+        .counter-details p { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.7rem; font-size: 0.85em; }
+        .counter-details p:last-child { margin-bottom: 0; }
+        .counter-details span:first-child { color: #D1D5DB; margin-right: 10px; flex-shrink: 0; }
+        .counter-details span:last-child { font-weight: 600; text-align: right; word-break: break-all; }
+        #totalGirando { color: #A78BFA; }
+        #valorLucroReceber { color: #FBBF24; /* Yellow for profit */}
+        #valorMediaPorcentagem { color: #60A5FA; /* Blue for percentage */ }
+        #valorLucroRealizado { color: #34D399; /* Green for realized profit */ }
+
+        /* --- Main Content --- */
+        main { flex: 1; padding: 2.5rem; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; animation: fadeIn 1s ease-out; position: relative; z-index: 1; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- Seções (Adapted FinançApp Content Card Style) --- */
+        .client-data, .client-summary, .financial-analysis, .cash-flow-analysis {
+            background-color: rgba(29, 29, 40, 0.75); /* Dark card bg */
+            backdrop-filter: blur(12px) saturate(120%);
+            border: 1px solid transparent;
+            border-image: linear-gradient(145deg, rgba(107, 33, 168, 0.4), rgba(79, 70, 229, 0.3), rgba(59, 130, 246, 0.4)) 1; /* Gradient border */
+            padding: 2rem 2.5rem; border-radius: 1rem; /* Adjusted for dashboard */
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(167, 139, 250, 0.05);
+            width: 100%; max-width: 1300px; /* Consistent max-width */
+            margin: 0 auto 2.5rem auto;
+            transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), border-image 0.35s ease-out;
+            will-change: opacity, transform, box-shadow;
+        }
+        .client-summary, .financial-analysis, .cash-flow-analysis {
+             opacity: 0; transform: translateY(35px) scale(0.98);
+             transition: opacity 0.7s ease-out, transform 0.7s ease-out,
+                         box-shadow 0.35s ease, border-image 0.35s ease;
+        }
+        .client-data { animation: popInSmooth 0.7s ease-out 0.1s backwards; }
+        @keyframes popInSmooth { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+        .client-summary.visible, .financial-analysis.visible, .cash-flow-analysis.visible { opacity: 1; transform: translateY(0) scale(1); }
+        .client-data:hover, .client-summary:hover, .financial-analysis:hover, .cash-flow-analysis:hover {
+             transform: translateY(-6px) scale(1.01);
+             box-shadow: 0 15px 45px rgba(0,0,0, 0.5), 0 0 25px rgba(124, 58, 237, 0.2);
+             border-image: linear-gradient(145deg, rgba(167, 139, 250, 0.7), rgba(124, 58, 237, 0.6), rgba(96, 165, 250, 0.6)) 1;
+        }
+        .client-data h2, .client-summary h2, .financial-analysis h2, .cash-flow-analysis h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #fff; margin-bottom: 1.8rem; text-align: center; font-weight: 600; font-size: 2em; /* Adjusted size */
+            position: relative; display: inline-block; left: 50%; transform: translateX(-50%); /* For ::after positioning */
+            padding-bottom: 0.5rem;
+        }
+        /* Section Title Glow (from FinançApp) */
+        .client-data h2::after, .client-summary h2::after, .financial-analysis h2::after, .cash-flow-analysis h2::after {
+            content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+            width: 60%; height: 3px;
+            background: linear-gradient(90deg, transparent, #A78BFA, #EC4899, transparent); /* FinançApp glow */
+            border-radius: 3px; opacity: 0.7;
+            transition: opacity 0.4s ease-in-out, width 0.4s ease-in-out;
+        }
+        .client-data:hover h2::after, .client-summary:hover h2::after, .financial-analysis:hover h2::after, .cash-flow-analysis:hover h2::after {
+             width: 80%; opacity: 0.9;
+        }
+        .client-data p { text-align: center; margin-bottom: 2rem; font-size: 1em; color: #D1D5DB; /* Lighter text */ }
+
+
+        /* --- Tabela (Dark & Futuristic) --- */
+        table {
+            width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 2.5rem;
+            background-color: rgba(20, 20, 30, 0.7); /* Darker table BG */
+            border-radius: 12px; overflow: hidden; /* Softer radius */
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+            table-layout: fixed; word-wrap: break-word;
+            border: 1px solid rgba(124, 58, 237, 0.2); /* Subtle purple border */
+        }
+        th {
+            background-color: rgba(40, 40, 55, 0.85); /* Darker header */
+            color: #C4B5FD; /* Purpleish text for headers */
+            font-weight: 600; padding: 0.9rem 1rem;
+            border-bottom: 2px solid rgba(167, 139, 250, 0.4); /* Stronger purple line */
+            white-space: normal; font-size: 0.9em; vertical-align: middle;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        td {
+            padding: 0.8rem 1rem; border-bottom: 1px solid rgba(124, 58, 237, 0.15); /* Fainter border */
+            vertical-align: middle; transition: background-color 0.3s ease, color 0.3s ease;
+            white-space: normal; font-size: 0.85em; color: #D1D5DB; /* Lighter text for data */
+        }
+        /* Col widths remain same */
+        col:nth-child(1) { width: 15%; } col:nth-child(2) { width: 18%; } col:nth-child(3) { width: 13%; } col:nth-child(4) { width: 10%; } col:nth-child(5) { width: 8%; } col:nth-child(6) { width: 10%; } col:nth-child(7) { width: 10%; } col:nth-child(8) { width: 13%; } col:nth-child(9) { width: 5%; } col:nth-child(10) { width: 8%; }
+
+        td:nth-child(1) { font-size: 0.7em; word-break: break-all; opacity: 0.65; color: #A0AEC0; }
+        td:nth-child(3), td:nth-child(4), td:nth-child(8) { text-align: right; font-feature-settings: "tnum"; font-variant-numeric: tabular-nums; }
+        td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(9), td:nth-child(10) { text-align: center; }
+
+        tbody tr { transition: background-color 0.25s ease, transform 0.25s ease-out; }
+        tbody tr:nth-child(even) { background-color: rgba(40, 40, 55, 0.4); } /* Slightly different even row */
+        tbody tr:hover {
+            background-color: rgba(87, 83, 182, 0.4); /* Purple hover */
+            transform: translateY(-2px); box-shadow: 0 5px 12px rgba(124, 58, 237, 0.25);
+            position: relative; z-index: 5;
+        }
+        tbody tr:hover td { color: #fff; } tbody tr:last-child td { border-bottom: none; }
+        /* Row entering/exiting animations remain same */
+        tbody tr.row-entering { opacity: 0; transform: translateY(15px) scale(0.98); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        tbody tr.row-entering.visible { opacity: 1; transform: translateY(0) scale(1); }
+        tbody tr.row-exiting { opacity: 1; transform: translateX(0) scale(1); transition: opacity 0.4s ease-in, transform 0.4s ease-in; }
+        tbody tr.row-exiting.hidden { opacity: 0; transform: translateX(-30px) scale(0.95); }
+
+        td.percentage-cell { font-style: italic; color: #A78BFA; opacity: 0.9; }
+        tbody tr:hover td.percentage-cell { color: #DDD6FE; opacity: 1; }
+
+        td input[type="text"], td input[type="number"], td input[type="date"] {
+            width: 100%; padding: 0.5rem 0.7rem;
+            border: 1px solid rgba(124, 58, 237, 0.35); /* Purple border */
+            border-radius: 6px; font-family: inherit; font-size: 0.95em;
+            background-color: rgba(13, 17, 23, 0.8); /* Dark input BG */
+            color: #E0E0E0; transition: all 0.25s ease-in-out;
+        }
+        td input[type="number"] { text-align: right; } td input[type="date"] { text-align: center; }
+        td input:focus {
+            outline: none; background-color: #0D1117;
+            border-color: #A78BFA; box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.4); /* Purple focus ring */
+        }
+        td.editing { background-color: rgba(87, 83, 182, 0.2) !important; padding: 0.15rem; }
+        td.editing input { padding: 0.6rem 0.7rem; }
+
+        /* Checkbox (Futuristic Toggle Style) */
+        td input[type="checkbox"] {
+            appearance: none; -webkit-appearance: none;
+            width: 40px; height: 20px; background-color: rgba(107, 114, 128, 0.5); /* Grayish off state */
+            border-radius: 10px; cursor: pointer; vertical-align: middle;
+            position: relative; transition: background-color 0.3s ease;
+            border: 1px solid rgba(167, 139, 250, 0.3);
+        }
+        td input[type="checkbox"]::before { /* The toggle knob */
+            content: ''; position: absolute;
+            width: 14px; height: 14px; background-color: #E0E0E0;
+            border-radius: 50%; top: 2px; left: 3px;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        td input[type="checkbox"]:hover { filter: brightness(1.1); }
+        td input[type="checkbox"]:checked {
+            background-image: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%); /* FinançApp primary gradient */
+            border-color: transparent;
+            box-shadow: 0 0 8px rgba(124, 58, 237, 0.5);
+        }
+        td input[type="checkbox"]:checked::before {
+            transform: translateX(20px); /* Moves knob to the right */
+            background-color: #fff;
+        }
+
+
+        /* --- Botões (Adapted from FinançApp) --- */
+        .action-button, .delete-button, .modal-button {
+            border: none; padding: 0.8rem 1.8rem; border-radius: 0.5rem; /* FinançApp default radius */
+            cursor: pointer; font-weight: 600; font-size: 0.9em;
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative; overflow: hidden;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.15); transform-origin: center; will-change: transform, box-shadow;
+        }
+        /* Primary Button (like FinançApp) */
+        .action-button, .modal-button-confirm {
+            color: white;
+            background-image: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+            box-shadow: 0 4px 15px rgba(107, 33, 168, 0.3), 0 1px 3px rgba(0,0,0,0.2);
+            display: block; width: fit-content; margin: 2rem auto 0 auto;
+        }
+        .action-button::before, .modal-button-confirm::before { /* Hover glow effect */
+            content: ""; position: absolute; top: 50%; left: 50%; width: 300%; height: 300%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 60%);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out; opacity: 0; border-radius: 50%;
+        }
+        .action-button:hover, .modal-button-confirm:hover {
+            background-image: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(107, 33, 168, 0.4), 0 3px 8px rgba(0,0,0,0.25);
+        }
+        .action-button:hover::before, .modal-button-confirm:hover::before {
+            transform: translate(-50%, -50%) scale(1); opacity: 1;
+        }
+        .action-button:active, .modal-button-confirm:active {
+            transform: translateY(-1px) scale(0.97); box-shadow: 0 2px 8px rgba(107, 33, 168, 0.3);
+        }
+
+        /* Delete Button (Outline Style) */
+        .delete-button, .modal-button-cancel {
+            border: 2px solid #A78BFA; /* Purple outline */
+            color: #C4B5FD; background-color: transparent;
+            padding: 0.35rem 0.7rem; font-size: 0.8em; border-radius: 0.375rem;
+            display: inline-flex; align-items: center; justify-content: center; vertical-align: middle;
+        }
+        .delete-button:hover, .modal-button-cancel:hover {
+            background-color: rgba(167, 139, 250, 0.15); color: #DDD6FE; border-color: #C4B5FD;
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
+        }
+        .delete-button:active, .modal-button-cancel:active {
+            transform: translateY(0px) scale(0.98); background-color: rgba(167, 139, 250, 0.25);
+        }
+
+        .modal-button { padding: 0.7rem 1.5rem; font-size: 0.9em; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25); }
+        .action-button span, .delete-button span, .modal-button span { position: relative; z-index: 1; }
+
+
+        /* --- Seção Resumo Cliente (Adapted Content Card) --- */
+        .summary-content-wrapper { display: flex; flex-wrap: wrap; gap: 2rem; align-items: flex-start; }
+        .client-summary-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.5rem; flex: 2 1 480px; min-width: 280px; }
+        .summary-placeholder { grid-column: 1 / -1; text-align: center; color: #A0AEC0; font-style: italic; padding: 2.5rem 0; font-size: 1em; }
+
+        .client-summary-item { /* Individual client summary cards */
+            background: linear-gradient(145deg, rgba(40, 40, 60, 0.85), rgba(25, 25, 40, 0.9)); /* Darker inner card */
+            padding: 1.2rem; border-radius: 0.75rem;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex; flex-direction: column; gap: 0.6rem;
+            opacity: 0; transform: scale(0.95) rotate(-2deg);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out, box-shadow 0.3s ease, background 0.3s ease;
+            will-change: opacity, transform, box-shadow;
+        }
+        .client-summary.visible .client-summary-item { opacity: 1; transform: scale(1) rotate(0deg); }
+        /* Stagger animation delays remain similar */
+        .client-summary.visible .client-summary-item:nth-child(1) { transition-delay: 0.1s; } .client-summary.visible .client-summary-item:nth-child(2) { transition-delay: 0.15s; } .client-summary.visible .client-summary-item:nth-child(3) { transition-delay: 0.2s; } .client-summary.visible .client-summary-item:nth-child(4) { transition-delay: 0.25s; } .client-summary.visible .client-summary-item:nth-child(5) { transition-delay: 0.3s; }
+
+        .client-summary-item:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+            background: linear-gradient(145deg, rgba(50, 50, 70, 0.9), rgba(35, 35, 50, 0.95));
+        }
+        .client-summary-item .client-name { font-size: 1.05em; font-weight: 600; color: #DDD6FE; margin-bottom: 0.5rem; word-break: break-all; }
+        .client-summary-item .client-total-due {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.25em; font-weight: 700; color: #6EE7B7; /* Mint green */
+            text-shadow: 0 0 6px rgba(74, 222, 128, 0.4);
+            text-align: right; margin-top: auto;
+        }
+        .client-chart-container { /* Chart container card */
+            flex: 1 1 360px; min-width: 300px; padding: 1.2rem;
+            background-color: rgba(25, 25, 40, 0.7); border-radius: 0.75rem;
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            display: flex; justify-content: center; align-items: center; position: relative; min-height: 300px;
+            opacity: 0; transform: scale(0.95) rotate(2deg);
+            transition: opacity 0.6s ease-out 0.2s, transform 0.6s ease-out 0.2s;
+            will-change: opacity, transform;
+        }
+        .client-summary.visible .client-chart-container { opacity: 1; transform: scale(1) rotate(0deg); }
+        #clientDebtChart { max-width: 100%; max-height: 380px; }
+        .chart-placeholder { color: #A0AEC0; font-style: italic; text-align: center; font-size: 1em; }
+
+
+        /* --- Seção Análise Financeira (Adapted Content Card) --- */
+        .investment-limit-container { /* Inner card for limit */
+            background-color: rgba(20, 20, 30, 0.65); padding: 1.2rem 1.8rem;
+            border-radius: 0.75rem; margin-bottom: 2rem;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+        .investment-limit-container h3 { text-align: center; color: #DDD6FE; font-family: 'Orbitron', sans-serif; font-weight: 500; font-size: 1.15em; margin-bottom: 1.2rem; }
+        .limit-details { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.8rem; font-size: 0.9em; color: #D1D5DB; }
+        .limit-details span strong { color: #E0E0E0; font-weight: 600; margin-left: 4px; font-feature-settings: "tnum"; font-variant-numeric: tabular-nums; }
+        .limit-details span strong.available { color: #6EE7B7; text-shadow: 0 0 4px #6EE7B7; }
+        .limit-details span strong.warning { color: #FBBF24; text-shadow: 0 0 4px #FBBF24; }
+        .limit-details span strong.danger { color: #F87171; text-shadow: 0 0 4px #F87171; }
+
+        .progress-bar-bg { /* Progress bar styling */
+            width: 100%; height: 16px; background-color: rgba(13, 17, 23, 0.9);
+            border-radius: 50px; overflow: hidden;
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.4); margin-bottom: 0.5rem;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background-image: linear-gradient(135deg, #8B5CF6 0%, #6366F1 50%, #A78BFA 100%); /* Purple/blue gradient */
+            background-size: 250% 100%; border-radius: 50px;
+            transition: width 0.7s ease-out;
+            box-shadow: 0 0 8px rgba(167, 139, 250, 0.4);
+            animation: progressShine 3.5s linear infinite;
+        }
+        @keyframes progressShine { to { background-position: 250% 100%; } }
+        .progress-percentage { text-align: right; font-size: 0.8em; color: #C4B5FD; font-weight: 500; }
+
+        .additional-charts-container { display: flex; flex-wrap: wrap; gap: 1.8rem; justify-content: center; }
+        .chart-box { /* Inner card for charts */
+            background: linear-gradient(145deg, rgba(40, 40, 60, 0.85), rgba(25, 25, 40, 0.9));
+            padding: 1.2rem; border-radius: 0.75rem;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            flex: 1 1 380px; min-width: 280px; display: flex; flex-direction: column;
+            opacity: 0; transform: scale(0.95) rotate(-1.5deg);
+            transition: opacity 0.5s ease-out 0.2s, transform 0.5s ease-out 0.2s, box-shadow 0.3s ease, background 0.3s ease;
+            will-change: opacity, transform, box-shadow;
+        }
+        .financial-analysis.visible .chart-box { opacity: 1; transform: scale(1) rotate(0deg); }
+        .financial-analysis.visible .chart-box:nth-child(1) { transition-delay: 0.3s; }
+        .financial-analysis.visible .chart-box:nth-child(2) { transition-delay: 0.4s; }
+
+        .chart-box:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+            background: linear-gradient(145deg, rgba(50, 50, 70, 0.9), rgba(35, 35, 50, 0.95));
+        }
+        .chart-box h4 { text-align: center; color: #DDD6FE; font-family: 'Orbitron', sans-serif; font-weight: 500; margin-bottom: 1.2rem; font-size: 1.1em; }
+        .chart-wrapper { position: relative; width: 100%; flex-grow: 1; min-height: 240px; display: flex; justify-content: center; align-items: center; }
+        .chart-wrapper canvas { max-width: 100%; max-height: 340px; }
+
+
+        /* --- Seção Fluxo de Caixa (Adapted Content Card) --- */
+        .cash-flow-analysis .chart-box { /* Full width chart box */
+            flex-basis: 100%;
+            opacity: 0; transform: scale(0.98) translateY(25px);
+            transition: opacity 0.7s ease-out 0.3s, transform 0.7s ease-out 0.3s;
+            will-change: opacity, transform;
+        }
+        .cash-flow-analysis.visible .chart-box { opacity: 1; transform: scale(1) translateY(0); }
+        .cash-flow-analysis .chart-wrapper { min-height: 310px; }
+        #cashFlowChart { max-width: 100%; max-height: 460px; }
+
+
+        /* --- Footer (Dark & Themed) --- */
+        .site-footer {
+            background: linear-gradient(180deg, #0D1117 0%, #0A0D11 100%); /* Darker footer */
+            padding: 1.5rem 0; margin-top: auto;
+            color: #A0AEC0; /* Grayish text */
+            font-size: 0.85em;
+            border-top: 1px solid rgba(124, 58, 237, 0.15); /* Subtle purple top border */
+            text-align: center; position: relative; z-index: 1;
+        }
+        .site-footer .container { position: relative; }
+        .site-footer .container::before { /* FinançApp footer line style */
+            content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+            width: 50px; height: 2px;
+            background: linear-gradient(90deg, #A78BFA, #EC4899); /* Purple-pink gradient */
+            border-radius: 1px; box-shadow: 0 0 6px rgba(167, 139, 250, 0.6);
+            animation: footerLinePulse 3s infinite alternate ease-in-out;
+        }
+        @keyframes footerLinePulse {
+            from { width: 45px; opacity: 0.6; box-shadow: 0 0 5px rgba(167, 139, 250, 0.4); transform: translateX(-50%) scaleX(1); }
+            to { width: 70px; opacity: 0.9; box-shadow: 0 0 10px rgba(192, 132, 252, 0.7); transform: translateX(-50%) scaleX(1.05); }
+        }
+        .site-footer a {
+            color: #A78BFA; /* Purple link */
+            text-decoration: none; transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+        .site-footer a:hover {
+            color: #C4B5FD; /* Lighter purple hover */
+            text-shadow: 0 0 4px #C4B5FD;
+        }
+
+
+        /* --- Modal (Dark & Themed) --- */
+         .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(13, 17, 23, 0.8); /* Dark overlay */
+            backdrop-filter: blur(6px) saturate(110%);
+            display: flex; justify-content: center; align-items: center; z-index: 1050;
+            opacity: 0; visibility: hidden; transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; transition: opacity 0.35s ease, visibility 0s linear 0s; }
+        .modal-container { /* Styled like content-card */
+            background: linear-gradient(145deg, rgba(40, 40, 60, 0.98), rgba(25, 25, 40, 0.98));
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            padding: 2rem 2.5rem; border-radius: 0.75rem;
+            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.5);
+            text-align: center; color: #E0E0E0; max-width: 440px; width: 90%;
+            transform: scale(0.85) rotate(-3deg); opacity: 0;
+            transition: opacity 0.45s ease-out, transform 0.45s ease-out;
+            will-change: transform, opacity;
+        }
+        .modal-overlay.active .modal-container { opacity: 1; animation: popInModalSmooth 0.55s ease-out forwards; }
+        @keyframes popInModalSmooth {
+            0% { transform: scale(0.85) rotate(-3deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5em; font-weight: 600; margin-bottom: 0.8rem;
+            color: #F87171; /* Reddish for warning */
+            text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+        }
+        .modal-message { font-size: 0.95em; margin-bottom: 1.8rem; line-height: 1.65; color: #D1D5DB; }
+        .modal-message strong { color: #FCA5A5; /* Lighter red for emphasis */ font-weight: 600; }
+        .modal-actions { display: flex; justify-content: center; gap: 1rem; }
+
+
+        /* --- Responsividade (Adjustments for new theme) --- */
+        @media (max-width: 992px) {
+             header { padding: 0.8rem 1.5rem; } header h1 { font-size: 1.6em; } main { padding: 2rem 1.2rem; }
+             .client-data, .client-summary, .financial-analysis, .cash-flow-analysis { padding: 1.8rem 1.5rem; border-radius: 0.85rem; margin-bottom: 2rem;}
+             .client-data h2, .client-summary h2, .financial-analysis h2, .cash-flow-analysis h2 { font-size: 1.8em; }
+             th, td { padding: 0.7rem 0.5rem; font-size: 0.82em; }
+             td:nth-child(1) { font-size: 0.68em; }
+             .action-button { padding: 0.75rem 1.5rem; font-size: 0.88em; } .delete-button { padding: 0.3rem 0.6rem; font-size: 0.78em; }
+             .total-counter-wrapper { top: 0.8rem; right: 1.5rem; }
+             .summary-content-wrapper { flex-direction: column; gap: 1.8rem; }
+        }
+        @media (max-width: 768px) {
+            body { padding-top: 0; }
+            header { position: static; flex-direction: column; text-align: center; gap: 0.7rem; padding-bottom: 1.2rem;}
+            .total-counter-wrapper { position: static; margin: 1.2rem auto 0 auto; }
+            main { padding: 1.2rem 0.8rem; }
+            .client-data, .client-summary, .financial-analysis, .cash-flow-analysis { padding: 1.5rem 1rem; border-radius: 0.75rem; margin-bottom: 1.8rem;}
+            .client-data h2, .client-summary h2, .financial-analysis h2, .cash-flow-analysis h2 { font-size: 1.6em; }
+            th, td { padding: 0.6rem 0.35rem; font-size: 0.78em; }
+             td:nth-child(1) { font-size: 0.62em; }
+            .action-button { padding: 0.7rem 1.3rem; font-size: 0.85em; } .delete-button { padding: 0.25rem 0.5rem; font-size: 0.75em; }
+            .site-footer { padding: 1.2rem 0; font-size: 0.8em; }
+            @keyframes footerLinePulse { from { width: 35px; opacity: 0.6; } to { width: 60px; opacity: 0.9; } }
+            .client-summary-list { grid-template-columns: 1fr; gap: 0.8rem; } .client-summary-item { padding: 1rem; }
+            .limit-details { font-size: 0.85em; flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+            .progress-bar-bg { height: 14px; } .chart-box { padding: 1rem; } .chart-box h4 { font-size: 1em; }
+        }
+        @media (max-width: 480px) {
+            header h1 { font-size: 1.4em; }
+            .total-counter-container { width: 90%; border-radius: 25px; } .counter-main { padding: 0.5rem 0.8rem; }
+            #valorCirculacaoPrincipal { font-size: 1em; } .counter-details { padding: 0.8rem; } .counter-details p { font-size: 0.8em;}
+            .client-data, .client-summary, .financial-analysis, .cash-flow-analysis { padding: 1rem 0.6rem; border-radius: 0.6rem; margin-bottom: 1.2rem;}
+            .client-data h2, .client-summary h2, .financial-analysis h2, .cash-flow-analysis h2 { font-size: 1.4em; }
+            th, td { font-size: 0.72em; }
+             td:nth-child(1) { font-size: 0.58em; }
+            .action-button { padding: 0.6rem 1rem; font-size: 0.82em; } .delete-button { padding: 0.2rem 0.4rem; font-size: 0.7em; }
+            .modal-container { padding: 1.5rem 1rem; border-radius: 0.6rem; } .modal-title { font-size: 1.3em; } .modal-message { font-size: 0.85em; }
+            .modal-actions { flex-direction: column; gap: 0.7rem; } .modal-button { width: 100%; padding: 0.8rem; }
+            .client-summary-item .client-name { font-size: 0.95em; } .client-summary-item .client-total-due { font-size: 1.1em; }
+            .client-chart-container { min-height: 230px; }
+            .investment-limit-container { padding: 0.8rem 1rem; } .investment-limit-container h3 { font-size: 1em; margin-bottom: 0.8rem; }
+            .limit-details span strong { font-size: 0.9em; } .chart-box h4 { font-size: 0.95em; margin-bottom: 0.8rem;}
+            .chart-wrapper { min-height: 180px; }
+             .cash-flow-analysis .chart-wrapper { min-height: 230px; }
+             td input[type="checkbox"] { width: 36px; height: 18px; } /* Smaller checkbox toggle on mobile */
+             td input[type="checkbox"]::before { width: 12px; height: 12px; top: 2px; left: 3px; }
+             td input[type="checkbox"]:checked::before { transform: translateX(18px); }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Starry Sky Backdrop Div -->
+    <div id="starry-sky-backdrop"></div>
+
+    <!-- HTML Estrutural (Sem alterações aqui, a não ser pequenas classes/IDs se necessário) -->
+    <header>
+      <h1>FinançApp Cosmos</h1> <!-- Thematic Name -->
+       <div class="total-counter-wrapper">
+            <div class="total-counter-container">
+                <div class="counter-main">
+                    <span>Capital Estelar:</span> <!-- Thematic Text -->
+                    <span id="valorCirculacaoPrincipal">R$ 0,00</span>
+                </div>
+                <div class="counter-details">
+                    <p><span>Total em Órbita:</span> <span id="totalGirando">R$ 0,00</span></p>
+                    <p><span>Lucro Nebuloso:</span> <span id="valorLucroReceber">R$ 0,00</span></p>
+                    <p><span>Taxa Pulsar Média (%):</span> <span id="valorMediaPorcentagem">0.00%</span></p>
+                    <p><span>Poeira Cósmica Coletada:</span> <span id="valorLucroRealizado">R$ 0,00</span></p>
+                </div>
+            </div>
+       </div>
+    </header>
+
+    <main>
+        <section class="client-data">
+            <h2>Painel de Créditos Interplanetários</h2> <!-- Thematic Title -->
+            <p>Gerencie seus créditos com a precisão de um astrolábio. Clique duas vezes para editar.</p>
+            <table>
+                <colgroup> <col> <col> <col> <col> <col> <col> <col> <col> <col> <col> </colgroup>
+                <thead>
+                    <tr>
+                        <th>ID Sonda</th> <th>Explorador</th> <th>Valor Base</th> <th>Rendimento (R$)</th> <!-- Thematic Headers -->
+                        <th>Taxa (%)</th> <th>Data Lançamento</th> <th>Data Retorno</th> <th>Valor Resgate</th>
+                        <th>Coletado?</th> <th>Comandos</th>
+                    </tr>
+                </thead>
+                <tbody id="clientTableBody">
+                    <!-- Linhas serão inseridas pelo JavaScript -->
+                </tbody>
+            </table>
+            <button id="addClientBtn" class="action-button"><span>Nova Missão de Crédito</span></button>
+        </section>
+
+        <section id="clientSummarySection" class="client-summary">
+             <h2>Relatório de Exploradores (Valores Pendentes)</h2>
+            <div class="summary-content-wrapper">
+                <div id="clientSummaryList" class="client-summary-list">
+                    <p class="summary-placeholder">Analisando constelações de dados...</p>
+                </div>
+                <div id="clientChartContainer" class="client-chart-container">
+                    <canvas id="clientDebtChart"></canvas>
+                    <p id="chartPlaceholder" class="chart-placeholder">Visualizando órbitas financeiras...</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="financialAnalysisSection" class="financial-analysis">
+            <h2>Telemetria Financeira da Frota</h2>
+            <div id="investmentLimitContainer" class="investment-limit-container">
+                <h3>Nível de Energia do Reator de Investimento</h3>
+                <div class="limit-details">
+                    <span>Energia em Uso: <strong id="circulacaoValor">R$ 0,00</strong></span>
+                    <span>Capacidade Máxima: <strong id="limiteValor">R$ 3.000,00</strong></span>
+                    <span>Energia Reserva: <strong id="disponivelValor" class="available">R$ 3.000,00</strong></span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="progressBarFill" class="progress-bar-fill" style="width: 0%;"></div>
+                </div>
+                <div class="progress-percentage" id="progressBarPercentage">0% Utilizado</div>
+            </div>
+            <div id="additionalChartsContainer" class="additional-charts-container">
+                <div class="chart-box">
+                    <h4>Composição do Tesouro Galáctico</h4>
+                    <div class="chart-wrapper">
+                        <canvas id="profitMarginChart"></canvas>
+                        <p id="profitMarginPlaceholder" class="chart-placeholder">Contando estrelas...</p>
+                    </div>
+                </div>
+                <div class="chart-box">
+                    <h4>Status das Missões de Crédito</h4>
+                     <div class="chart-wrapper">
+                        <canvas id="loanStatusChart"></canvas>
+                        <p id="loanStatusPlaceholder" class="chart-placeholder">Verificando logs...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+         <section id="cashFlowSection" class="cash-flow-analysis">
+            <h2>Histórico de Fluxo Cósmico (Capital)</h2>
+            <div class="chart-box">
+                <h4>Evolução do Núcleo de Capital</h4>
+                 <div class="chart-wrapper">
+                    <canvas id="cashFlowChart"></canvas>
+                    <p id="cashFlowPlaceholder" class="chart-placeholder">Calculando trajetória temporal...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>© 2024 FinançApp Cosmos. Navegando o universo das suas finanças.</p>
+        </div>
+    </footer>
+
+    <div id="confirmDeleteOverlay" class="modal-overlay">
+         <div id="confirmDeleteModal" class="modal-container">
+            <h3 class="modal-title">🚨 Alerta de Buraco Negro! 🚨</h3>
+            <p class="modal-message">Tem certeza que deseja ejetar esta missão de crédito para o esquecimento? <br><strong>Esta ação é irreversível e alterará o continuum espaço-tempo financeiro!</strong></p>
+            <div class="modal-actions">
+                <button id="confirmDeleteBtn" class="modal-button modal-button-confirm">Sim, Ejetar!</button>
+                <button id="cancelDeleteBtn" class="modal-button modal-button-cancel">Cancelar Manobra</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs and Config (No change needed here) -->
+    <script type="module">
+      const firebaseConfig = {
+        apiKey: "AIzaSyBYYvRNDdXD6ILYYzXZK5l6hQoLk7Ikrbs",
+        authDomain: "projeto-financeiro-84c65.firebaseapp.com",
+        databaseURL: "https://projeto-financeiro-84c65-default-rtdb.firebaseio.com",
+        projectId: "projeto-financeiro-84c65",
+        storageBucket: "projeto-financeiro-84c65.firebasestorage.app",
+        messagingSenderId: "290551393578",
+        appId: "1:290551393578:web:b0e5898d441360f5af4253"
+      };
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+      import { getDatabase, ref, get, set, update, push, remove, child } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+      const emprestimosRef = ref(database, 'emprestimos');
+      window.firebase = { database, emprestimosRef, ref, get, set, update, push, remove, child };
+    </script>
+
+    <!-- Main Script (No functional changes needed for this styling task) -->
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(initializeMainScript, 50);
+        });
+
+        function initializeMainScript() {
+            if (!window.firebase || !window.firebase.database || !window.firebase.emprestimosRef) {
+                 console.error("[FRONTEND] ERRO: Firebase não parece ter sido inicializado corretamente.");
+                 const tableBody = document.getElementById('clientTableBody');
+                 if (tableBody) {
+                    tableBody.innerHTML = '<tr><td colspan="10" style="color:red; text-align:center;">Erro Crítico: Falha na inicialização do Firebase. Verifique o console.</td></tr>';
+                 }
+                 return;
+            }
+
+            const { database, emprestimosRef, ref, get, set, update, push, remove, child } = window.firebase;
+
+            const tableBody = document.getElementById('clientTableBody');
+            const valorCirculacaoPrincipalEl = document.getElementById('valorCirculacaoPrincipal');
+            const totalGirandoEl = document.getElementById('totalGirando');
+            const valorLucroReceberEl = document.getElementById('valorLucroReceber');
+            const valorMediaPorcentagemEl = document.getElementById('valorMediaPorcentagem');
+            const valorLucroRealizadoEl = document.getElementById('valorLucroRealizado');
+            const addClientBtn = document.getElementById('addClientBtn');
+            const confirmDeleteOverlay = document.getElementById('confirmDeleteOverlay');
+            const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            const modalMessage = confirmDeleteModal?.querySelector('.modal-message');
+            const clientSummarySection = document.getElementById('clientSummarySection');
+            const clientSummaryList = document.getElementById('clientSummaryList');
+            const clientChartContainer = document.getElementById('clientChartContainer');
+            const clientDebtChartCanvas = document.getElementById('clientDebtChart');
+            const chartPlaceholder = document.getElementById('chartPlaceholder');
+            const financialAnalysisSection = document.getElementById('financialAnalysisSection');
+            const investmentLimitContainer = document.getElementById('investmentLimitContainer');
+            const circulacaoValorEl = document.getElementById('circulacaoValor');
+            const limiteValorEl = document.getElementById('limiteValor');
+            const disponivelValorEl = document.getElementById('disponivelValor');
+            const progressBarFillEl = document.getElementById('progressBarFill');
+            const progressBarPercentageEl = document.getElementById('progressBarPercentage');
+            const additionalChartsContainer = document.getElementById('additionalChartsContainer');
+            const profitMarginChartCanvas = document.getElementById('profitMarginChart');
+            const profitMarginPlaceholder = document.getElementById('profitMarginPlaceholder');
+            const loanStatusChartCanvas = document.getElementById('loanStatusChart');
+            const loanStatusPlaceholder = document.getElementById('loanStatusPlaceholder');
+            const cashFlowSection = document.getElementById('cashFlowSection');
+            const cashFlowChartCanvas = document.getElementById('cashFlowChart');
+            const cashFlowPlaceholder = document.getElementById('cashFlowPlaceholder');
+
+            let clientData = [];
+            let loanIdToDelete = null;
+            window.summaryRendered = false; window.financialAnalysisRendered = false; window.cashFlowRendered = false;
+            let clientChartInstance = null; let profitMarginChartInstance = null; let loanStatusChartInstance = null; let cashFlowChartInstance = null;
+            const INITIAL_INVESTMENT_LIMIT = 3000;
+
+            const formatCurrency = (value) => { try { return isNaN(value) ? 'R$ 0,00' : value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); } catch { return 'R$ 0,00'; }};
+            const formatPercentage = (value) => { try { return (isNaN(value) || !isFinite(value)) ? '0.00%' : value.toFixed(2) + '%'; } catch { return '0.00%'; }};
+            const calculatePercentageInterest = (valorEmprestimo, jurosDinheiro) => { const val = parseFloat(valorEmprestimo); const juros = parseFloat(jurosDinheiro); if (!val || val <= 0 || isNaN(val) || isNaN(juros)) return 0; return (juros / val) * 100; };
+            const calculateTotalValue = (emprestimo) => { const valor = parseFloat(emprestimo?.valorEmprestimo) || 0; const juros = parseFloat(emprestimo?.jurosDinheiro) || 0; return valor + juros; };
+            function addOneMonth(dateString) { if (!dateString || isNaN(new Date(dateString).getTime())) { return dateString || ''; } try { const date = new Date(dateString + 'T00:00:00'); date.setMonth(date.getMonth() + 1); const year = date.getFullYear(); const month = String(date.getMonth() + 1).padStart(2, '0'); const day = String(date.getDate()).padStart(2, '0'); return `${year}-${month}-${day}`; } catch (error) { console.error("Erro addOneMonth:", error); return dateString; } }
+            function generateChartColors(count) { // FinançApp-like colors
+                const base = [
+                    'rgba(167, 139, 250, 0.8)', /* purple-400 */ 'rgba(96, 165, 250, 0.8)', /* blue-400 */
+                    'rgba(52, 211, 153, 0.8)',  /* emerald-400 */ 'rgba(251, 191, 36, 0.8)', /* amber-400 */
+                    'rgba(248, 113, 113, 0.8)', /* red-400 */   'rgba(236, 72, 153, 0.8)', /* pink-500 */
+                    'rgba(192, 132, 252, 0.75)',/* violet-400 */'rgba(129, 140, 248, 0.75)' /* indigo-400 */
+                ];
+                const c = []; for (let i = 0; i < count; i++) c.push(base[i % base.length]); return c;
+            }
+            function sortClientDataByDate() { clientData.sort((a, b) => { const dateA = a?.dataEmprestimo ? new Date(a.dataEmprestimo + 'T00:00:00') : null; const dateB = b?.dataEmprestimo ? new Date(b.dataEmprestimo + 'T00:00:00') : null; if (!dateA && !dateB) return 0; if (!dateA) return 1; if (!dateB) return -1; return dateA - dateB; }); }
+
+            const calculateTotalGirando = () => clientData.filter(c => c && !c.pago).reduce((sum, c) => sum + calculateTotalValue(c), 0);
+            const calculateEmCirculacao = () => clientData.filter(c => c && !c.pago).reduce((sum, c) => sum + (parseFloat(c.valorEmprestimo) || 0), 0);
+            const calculateLucroAReceber = () => clientData.filter(c => c && !c.pago).reduce((sum, c) => sum + (parseFloat(c.jurosDinheiro) || 0), 0);
+            const calculateMediaPorcentagem = () => { const v = clientData.filter(c => c && c.valorEmprestimo > 0 && !c.pago); if (v.length === 0) return 0; const p = v.map(c => calculatePercentageInterest(c.valorEmprestimo, c.jurosDinheiro)); const s = p.reduce((a, c) => a + c, 0); return s / v.length; };
+            const calculateLucroRealizado = () => clientData.filter(c => c && c.pago).reduce((sum, c) => sum + (parseFloat(c.jurosDinheiro) || 0), 0);
+            const calculateCurrentLimit = () => INITIAL_INVESTMENT_LIMIT + calculateLucroRealizado();
+
+             function animateCounter(el, start, end, duration) { let startT = null; function step(ts) { if (!startT) startT = ts; const p = Math.min((ts - startT) / duration, 1); const easedProgress = 1 - Math.pow(1 - p, 3); const current = start + (end - start) * easedProgress; if (el) el.textContent = formatCurrency(current); if (p < 1) requestAnimationFrame(step); else if (el) el.textContent = formatCurrency(end); } requestAnimationFrame(step); }
+             const updateCounters = () => { try{ const vC = calculateEmCirculacao(); const tG = calculateTotalGirando(); const currentVC = parseFloat(valorCirculacaoPrincipalEl?.textContent.replace(/[^0-9,-]/g, '').replace(',', '.')) || 0; const currentTG = parseFloat(totalGirandoEl?.textContent.replace(/[^0-9,-]/g, '').replace(',', '.')) || 0; const currentLR = parseFloat(valorLucroReceberEl?.textContent.replace(/[^0-9,-]/g, '').replace(',', '.')) || 0; const currentLReal = parseFloat(valorLucroRealizadoEl?.textContent.replace(/[^0-9,-]/g, '').replace(',', '.')) || 0; animateCounter(valorCirculacaoPrincipalEl, currentVC, vC, 800); animateCounter(totalGirandoEl, currentTG, tG, 800); animateCounter(valorLucroReceberEl, currentLR, calculateLucroAReceber(), 800); animateCounter(valorLucroRealizadoEl, currentLReal, calculateLucroRealizado(), 800); if(valorMediaPorcentagemEl) valorMediaPorcentagemEl.textContent = formatPercentage(calculateMediaPorcentagem()); } catch (e) { console.error("Erro em updateCounters:", e);} };
+
+            function calculateClientSummaries() { const summary = {}; clientData.forEach((client) => { if (client && client.pago === false && client.nome && client.nome.trim() !== '') { const normalizedName = client.nome.trim().toLowerCase(); const originalName = client.nome.trim(); const totalValue = calculateTotalValue(client); if (summary[normalizedName]) { summary[normalizedName].totalDue += totalValue; } else { summary[normalizedName] = { name: originalName, totalDue: totalValue }; } } }); const summaryArray = Object.values(summary); summaryArray.sort((a, b) => b.totalDue - a.totalDue); return summaryArray; }
+            function renderClientSummaries(summaries) { if (!clientSummaryList) return; clientSummaryList.innerHTML = ''; if (summaries.length === 0) { clientSummaryList.innerHTML = '<p class="summary-placeholder">Nenhum valor pendente nesta galáxia.</p>'; return; } summaries.forEach(item => { const el = document.createElement('div'); el.classList.add('client-summary-item'); el.innerHTML = `<div class="client-name">${item.name}</div><div class="client-total-due">${formatCurrency(item.totalDue)}</div>`; clientSummaryList.appendChild(el); }); window.summaryRendered = true; }
+            function renderOrUpdateClientChart(summaries) { try { if (!clientDebtChartCanvas || !clientChartContainer) return; const ctx = clientDebtChartCanvas.getContext('2d'); const hasData = summaries && summaries.length > 0; chartPlaceholder.style.display = hasData ? 'none' : 'block'; clientDebtChartCanvas.style.display = hasData ? 'block' : 'none'; if (!hasData) { if (clientChartInstance) { clientChartInstance.destroy(); clientChartInstance = null; } chartPlaceholder.textContent = "Nenhum explorador com pendências."; return; } const labels = summaries.map(item => item.name); const dataValues = summaries.map(item => item.totalDue); const backgroundColors = generateChartColors(summaries.length); const config = { type: 'doughnut', data: { labels: labels, datasets: [{ label: 'Valor Devido', data: dataValues, backgroundColor: backgroundColors, borderColor: '#0D1117', borderWidth: 2, hoverOffset: 8, hoverBorderColor: '#fff', hoverBorderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { color: '#E0E0E0', padding: 15, boxWidth: 12, font: { size: 11 } } }, tooltip: { callbacks: { label: (ctx) => `${ctx.label || ''}: ${formatCurrency(ctx.parsed)}` }, backgroundColor: 'rgba(13, 17, 23, 0.95)', titleFont: { size: 13, weight: '500' }, bodyFont: { size: 12 }, padding: 10, cornerRadius: 6, displayColors: true, boxPadding: 4, titleMarginBottom: 6, bodySpacing: 3 } }, layout: { padding: { top: 10, bottom: 10 } }, animation: { animateScale: true, animateRotate: true, duration: 800, easing: 'easeOutCubic' } } }; if (clientChartInstance) { clientChartInstance.data.labels = labels; clientChartInstance.data.datasets[0].data = dataValues; clientChartInstance.data.datasets[0].backgroundColor = backgroundColors; clientChartInstance.update('none'); } else { clientChartInstance = new Chart(ctx, config); } } catch(e) { console.error("Erro Gráfico Cliente:", e); if (chartPlaceholder) { chartPlaceholder.textContent = "Falha ao renderizar mapa estelar."; chartPlaceholder.style.display = 'block'; } if (clientDebtChartCanvas) clientDebtChartCanvas.style.display = 'none'; if (clientChartInstance) { clientChartInstance.destroy(); clientChartInstance = null; } } }
+            function triggerClientSummaryRender() { try { const s = calculateClientSummaries(); renderClientSummaries(s); renderOrUpdateClientChart(s); } catch (e) { console.error("Erro trigger Cliente:", e); } }
+
+             function updateInvestmentLimitBar() { if (!progressBarFillEl || !circulacaoValorEl || !limiteValorEl || !disponivelValorEl || !progressBarPercentageEl) return; const emCirc = calculateEmCirculacao(); const limit = calculateCurrentLimit(); let effLimit = limit; if (emCirc > limit) effLimit = emCirc; const disp = effLimit - emCirc; let perc = 0; if (effLimit > 0) perc = Math.min(100, (emCirc / effLimit) * 100); else if (emCirc > 0) perc = 100; circulacaoValorEl.textContent = formatCurrency(emCirc); limiteValorEl.textContent = formatCurrency(effLimit); disponivelValorEl.textContent = formatCurrency(disp > 0 ? disp : 0); progressBarPercentageEl.textContent = `${perc.toFixed(1)}% Utilizado`; progressBarFillEl.style.width = `${perc}%`; disponivelValorEl.className = 'available'; if (disp <= 0) disponivelValorEl.classList.add('danger'); else if (perc > 85) disponivelValorEl.classList.add('warning'); }
+             function renderOrUpdateAdditionalCharts() { try { if (profitMarginChartCanvas && profitMarginPlaceholder) { const ctx = profitMarginChartCanvas.getContext('2d'); const p = clientData.reduce((s, c) => s + (parseFloat(c.valorEmprestimo) || 0), 0); const j = clientData.reduce((s, c) => s + (parseFloat(c.jurosDinheiro) || 0), 0); const has = p > 0 || j > 0; profitMarginPlaceholder.style.display = has ? 'none' : 'block'; profitMarginChartCanvas.style.display = has ? 'block' : 'none'; if (!has) { if (profitMarginChartInstance) { profitMarginChartInstance.destroy(); profitMarginChartInstance = null; } profitMarginPlaceholder.textContent = "Dados insuficientes para análise."; } else { const d = { labels: ['Capital Base Total', 'Rendimento Estelar Total'], datasets: [{ data: [p, j], backgroundColor: generateChartColors(2).slice(0,2), borderColor: '#0D1117', borderWidth: 2, hoverOffset: 5 }] }; const cfg = { type: 'pie', data: d, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#E0E0E0', padding: 12 } }, tooltip: { callbacks: { label: (c) => `${c.label||''}: ${formatCurrency(c.parsed)}` }, backgroundColor: 'rgba(13, 17, 23, 0.95)', cornerRadius: 6, padding: 10 } }, animation: { animateScale: true, duration: 700, easing: 'easeOutBack' } } }; if (profitMarginChartInstance) { profitMarginChartInstance.data = d; profitMarginChartInstance.update('none'); } else { profitMarginChartInstance = new Chart(ctx, cfg); }}} if (loanStatusChartCanvas && loanStatusPlaceholder) { const ctx = loanStatusChartCanvas.getContext('2d'); const pago = clientData.filter(c => c && c.pago).length; const naoPago = clientData.filter(c => c && !c.pago).length; const has = pago > 0 || naoPago > 0; loanStatusPlaceholder.style.display = has ? 'none' : 'block'; loanStatusChartCanvas.style.display = has ? 'block' : 'none'; if (!has) { if (loanStatusChartInstance) { loanStatusChartInstance.destroy(); loanStatusChartInstance = null; } loanStatusPlaceholder.textContent = "Nenhuma missão registrada."; } else { const d = { labels: ['Missões Concluídas', 'Missões em Andamento'], datasets: [{ data: [pago, naoPago], backgroundColor: generateChartColors(4).slice(2,4), borderColor: '#0D1117', borderWidth: 2, hoverOffset: 5 }] }; const cfg = { type: 'doughnut', data: d, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { color: '#E0E0E0', padding: 12 } }, tooltip: { callbacks: { label: (c) => `${c.label||''}: ${c.parsed}` }, backgroundColor: 'rgba(13, 17, 23, 0.95)', cornerRadius: 6, padding: 10 } }, animation: { animateScale: true, animateRotate: true, duration: 700, easing: 'easeOutCubic' } } }; if (loanStatusChartInstance) { loanStatusChartInstance.data = d; loanStatusChartInstance.update('none'); } else { loanStatusChartInstance = new Chart(ctx, cfg); }}} window.financialAnalysisRendered = true; } catch (e) { console.error("Erro Gráficos Adicionais:", e); } }
+             function triggerFinancialAnalysisRender() { try { updateInvestmentLimitBar(); renderOrUpdateAdditionalCharts(); } catch(e) { console.error("Erro trigger Análise:", e); } }
+
+             function calculateCashFlowData() { if (clientData.length === 0) return [{ x: new Date(), y: INITIAL_INVESTMENT_LIMIT }]; let transactions = []; let firstDate = null; clientData.forEach(loan => { if (loan.dataEmprestimo && (!firstDate || new Date(loan.dataEmprestimo) < firstDate)) firstDate = new Date(loan.dataEmprestimo + 'T00:00:00'); }); const startDate = firstDate || new Date(); const initialPointDate = new Date(startDate); initialPointDate.setDate(initialPointDate.getDate() - 1); transactions.push({ date: initialPointDate, value: INITIAL_INVESTMENT_LIMIT, type: 'initial' }); clientData.forEach(loan => { if (loan.dataEmprestimo && !isNaN(new Date(loan.dataEmprestimo).getTime())) { const amount = parseFloat(loan.valorEmprestimo) || 0; if (amount > 0) transactions.push({ date: new Date(loan.dataEmprestimo + 'T00:00:00'), value: -amount, type: 'loan_out' }); } if (loan.pago === true && loan.dataVencimento && !isNaN(new Date(loan.dataVencimento).getTime())) { const amount = calculateTotalValue(loan); if (amount > 0) transactions.push({ date: new Date(loan.dataVencimento + 'T00:00:00'), value: amount, type: 'payment_in' }); }}); transactions.sort((a, b) => a.date - b.date); let cashFlowPoints = []; let balance = 0; transactions.forEach((t, i) => { balance = (i === 0 && t.type === 'initial') ? t.value : balance + t.value; cashFlowPoints.push({ x: t.date.getTime(), y: balance }); }); return cashFlowPoints; }
+             function renderOrUpdateCashFlowChart(cashFlowData) { try { if (!cashFlowChartCanvas || !cashFlowPlaceholder) return; const ctx = cashFlowChartCanvas.getContext('2d'); if (!ctx) return; const hasData = cashFlowData && cashFlowData.length > 1; cashFlowPlaceholder.style.display = hasData ? 'none' : 'block'; cashFlowChartCanvas.style.display = hasData ? 'block' : 'none'; if (!hasData) { if (cashFlowChartInstance) { cashFlowChartInstance.destroy(); cashFlowChartInstance = null; } cashFlowPlaceholder.textContent = "Dados insuficientes para traçar rota."; return; } cashFlowData.sort((a, b) => a.x - b.x); const config = { type: 'line', data: { datasets: [{ label: 'Saldo Capital', data: cashFlowData, borderColor: generateChartColors(1)[2], backgroundColor: 'rgba(52, 211, 153, 0.1)', borderWidth: 2, pointBackgroundColor: generateChartColors(1)[2], pointBorderColor: '#fff', pointHoverBackgroundColor: '#fff', pointHoverBorderColor: generateChartColors(1)[2], tension: 0.2, fill: true, pointRadius: 3, pointHoverRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { type: 'time', adapter: { date: dateFns }, time: { unit: cashFlowData.length > 60 ? 'month' : 'day', tooltipFormat: 'dd/MM/yyyy', displayFormats: { month: 'MMM/yy', day: 'dd/MM' } }, ticks: { color: '#D1D5DB', maxRotation: 0, autoSkipPadding: 25 }, grid: { color: 'rgba(167, 139, 250, 0.08)' } }, y: { beginAtZero: false, ticks: { color: '#D1D5DB', callback: (v) => formatCurrency(v).replace('R$', '') }, grid: { color: 'rgba(167, 139, 250, 0.1)' } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { title: (items) => items[0] ? dateFns.format(items[0].parsed.x, 'dd/MM/yyyy') : '', label: (ctx) => ` Saldo: ${formatCurrency(ctx.parsed.y)}` }, backgroundColor: 'rgba(13, 17, 23, 0.95)', titleFont: { size: 13 }, bodyFont: { size: 12 }, padding: 10, cornerRadius: 6, bodySpacing: 4 } }, interaction: { mode: 'index', intersect: false }, animation: { duration: 1000, easing: 'easeOutCubic' } } }; if (cashFlowChartInstance) { cashFlowChartInstance.data.datasets[0].data = cashFlowData; cashFlowChartInstance.options.scales.x.time.unit = cashFlowData.length > 60 ? 'month' : 'day'; cashFlowChartInstance.update('none'); } else { cashFlowChartInstance = new Chart(ctx, config); } window.cashFlowRendered = true; } catch (e) { console.error("Erro Gráfico Fluxo Caixa:", e); if (cashFlowPlaceholder) { cashFlowPlaceholder.textContent = "Falha ao mapear fluxo temporal."; cashFlowPlaceholder.style.display = 'block'; } if (cashFlowChartCanvas) cashFlowChartCanvas.style.display = 'none'; if (cashFlowChartInstance) { cashFlowChartInstance.destroy(); cashFlowChartInstance = null; } } }
+             function triggerCashFlowRender() { try { const data = calculateCashFlowData(); renderOrUpdateCashFlowChart(data); } catch(e) { console.error("Erro trigger Fluxo:", e); } }
+
+             function updateAllDynamicSections() { try { updateCounters(); } catch(e) { console.error("Erro updateCounters:", e); } try { updateInvestmentLimitBar(); } catch(e) { console.error("Erro updateLimitBar:", e); } const checkAndTrigger = (section, flagName, triggerFn) => { if (section?.classList.contains('visible') || !window[flagName]) { try { triggerFn(); } catch (e) { console.error(`Erro DENTRO trigger ${flagName}:`, e); } } }; checkAndTrigger(clientSummarySection, 'summaryRendered', triggerClientSummaryRender); checkAndTrigger(financialAnalysisSection, 'financialAnalysisRendered', triggerFinancialAnalysisRender); checkAndTrigger(cashFlowSection, 'cashFlowRendered', triggerCashFlowRender); }
+
+            const createObserverCallback = (sectionElement, flagName, renderTriggerFn) => (entries, observer) => { entries.forEach(entry => { if (entry.isIntersecting) { if (sectionElement) sectionElement.classList.add('visible'); if (!window[flagName]) { window[flagName] = true; try { renderTriggerFn(); } catch(e) { console.error(`Erro trigger observer ${flagName}:`, e); } } } }); };
+            try { const summaryObserver = new IntersectionObserver(createObserverCallback(clientSummarySection, 'summaryRendered', triggerClientSummaryRender), { threshold: 0.1 }); if (clientSummarySection) summaryObserver.observe(clientSummarySection); else console.warn("#clientSummarySection não obs."); } catch(e) { console.error("Erro observer Sumário:", e); }
+            try { const financialAnalysisObserver = new IntersectionObserver(createObserverCallback(financialAnalysisSection, 'financialAnalysisRendered', triggerFinancialAnalysisRender), { threshold: 0.1 }); if (financialAnalysisSection) financialAnalysisObserver.observe(financialAnalysisSection); else console.warn("#financialAnalysisSection não obs."); } catch(e) { console.error("Erro observer Análise:", e); }
+            try { const cashFlowObserver = new IntersectionObserver(createObserverCallback(cashFlowSection, 'cashFlowRendered', triggerCashFlowRender), { threshold: 0.1 }); if (cashFlowSection) cashFlowObserver.observe(cashFlowSection); else console.warn("#cashFlowSection não obs."); } catch(e) { console.error("Erro observer Fluxo:", e); }
+
+
+             const renderTable = () => {
+                 if (!tableBody) { return; }
+                 tableBody.innerHTML = '';
+                 if (!Array.isArray(clientData) || clientData.length === 0) {
+                    if(tableBody.innerHTML === '') {
+                       tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:30px; color:#A0AEC0;">Nenhuma missão de crédito detectada nos sensores.</td></tr>';
+                    }
+                    return;
+                 }
+                 clientData.forEach((client, index) => {
+                     try {
+                        if (!client || typeof client.id === 'undefined') { console.warn(`[renderTable] Pulando item inválido no índice ${index}:`, client); return; }
+                        const taxa = calculatePercentageInterest(client.valorEmprestimo, client.jurosDinheiro);
+                        const total = calculateTotalValue(client);
+                        const row = tableBody.insertRow();
+                        row.setAttribute('data-id', client.id);
+                        row.classList.add('row-entering');
+                        const dataEmpFormatada = client.dataEmprestimo ? new Date(client.dataEmprestimo + 'T00:00:00').toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : '';
+                        const dataVencFormatada = client.dataVencimento ? new Date(client.dataVencimento + 'T00:00:00').toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : '';
+
+                        row.innerHTML = `
+                            <td data-label="ID Sonda">${client.id}</td>
+                            <td data-label="Explorador" data-field="nome">${client.nome || 'S/N'}</td>
+                            <td data-label="Valor Base" data-field="valorEmprestimo" data-type="number">${formatCurrency(client.valorEmprestimo)}</td>
+                            <td data-label="Rendimento (R$)" data-field="jurosDinheiro" data-type="number">${formatCurrency(client.jurosDinheiro)}</td>
+                            <td data-label="Taxa (%)" class="percentage-cell">${formatPercentage(taxa)}</td>
+                            <td data-label="Data Lançamento" data-field="dataEmprestimo" data-type="date" data-value="${client.dataEmprestimo || ''}">${dataEmpFormatada}</td>
+                            <td data-label="Data Retorno" data-field="dataVencimento" data-type="date" data-value="${client.dataVencimento || ''}">${dataVencFormatada}</td>
+                            <td data-label="Valor Resgate">${formatCurrency(total)}</td>
+                            <td data-label="Coletado?" data-field="pago" data-type="boolean"><input type="checkbox" ${client.pago ? 'checked' : ''} data-id="${client.id}"></td>
+                            <td data-label="Comandos"><button class="delete-button" data-id="${client.id}">Ejetar</button></td>
+                        `;
+                        row.querySelectorAll('td[data-field]:not([data-field="pago"])').forEach(c => c.addEventListener('dblclick', (e) => makeCellEditable(e.currentTarget, client.id), { once: true }));
+                        row.querySelector('input[type="checkbox"]')?.addEventListener('change', (e) => handleCheckboxChange(e, client.id));
+                        row.querySelector('.delete-button')?.addEventListener('click', () => showDeleteConfirmation(client.id));
+                        requestAnimationFrame(() => { requestAnimationFrame(() => row.classList.add('visible')); });
+                     } catch (error) { console.error(`[renderTable] Erro renderizando linha ${index}, ID ${client?.id}:`, error); const errorRow = tableBody.insertRow(); errorRow.innerHTML = `<td colspan="10" style="color:orange; text-align:center;">Erro renderizando ID ${client?.id || '??'}</td>`; }
+                 });
+             };
+
+             const makeCellEditable = (cell, id) => {
+                 const client = clientData.find(cl => cl && cl.id === id);
+                 if (!client || cell.querySelector('input')) return;
+                 const field = cell.getAttribute('data-field');
+                 const type = cell.getAttribute('data-type');
+                 const originalValue = type === 'date' ? cell.getAttribute('data-value') : client[field];
+                 const originalHTML = cell.innerHTML;
+                 cell.classList.add('editing');
+                 cell.innerHTML = '';
+                 let inputElement;
+                 if (type === 'date') { inputElement = document.createElement('input'); inputElement.type = 'date'; inputElement.value = originalValue || ''; }
+                 else if (type === 'number') { inputElement = document.createElement('input'); inputElement.type = 'number'; inputElement.value = originalValue || 0; if (field === 'jurosDinheiro' || field === 'valorEmprestimo') inputElement.step = '0.01'; inputElement.min = '0'; }
+                 else { inputElement = document.createElement('input'); inputElement.type = 'text'; inputElement.value = originalValue || ''; }
+
+                 const save = () => {
+                     if (!cell.contains(inputElement)) return;
+                     cell.classList.remove('editing');
+                     saveEdit(inputElement, cell, id, field, originalHTML);
+                 };
+                 const cancel = (event) => {
+                     event?.stopPropagation();
+                     if (!cell.contains(inputElement)) return;
+                     cell.classList.remove('editing');
+                     cell.innerHTML = originalHTML;
+                     setTimeout(() => {
+                         if(document.body.contains(cell)) {
+                            cell.addEventListener('dblclick', (e) => makeCellEditable(e.currentTarget, id), { once: true });
+                         }
+                     }, 50);
+                 };
+
+                 inputElement.addEventListener('blur', save);
+                 inputElement.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); save(); } else if (e.key === 'Escape') { cancel(e); } });
+                 cell.appendChild(inputElement);
+                 inputElement.focus();
+                 inputElement.select();
+             };
+
+             async function saveEdit(input, cell, id, field, originalHTML) {
+                let newValue = input.value;
+                const type = cell.getAttribute('data-type');
+                let validationError = false;
+                let valueToSave = newValue;
+
+                if (type === 'number') { valueToSave = newValue.replace(',', '.'); valueToSave = parseFloat(valueToSave); if (isNaN(valueToSave) || valueToSave < 0) { alert('Valor numérico inválido.'); validationError = true; } }
+                else if (type === 'date') { if (newValue && !/^\d{4}-\d{2}-\d{2}$/.test(newValue)) { alert('Formato de data inválido. Use AAAA-MM-DD.'); validationError = true; } else if (newValue && isNaN(new Date(newValue + 'T00:00:00').getTime())) { alert('Data inválida.'); validationError = true; } valueToSave = newValue; }
+                else if (type === 'text') { valueToSave = newValue.trim(); }
+
+                const clientIndex = clientData.findIndex(c => c && c.id === id);
+                if (clientIndex === -1) { console.error(`Cliente com ID ${id} não encontrado localmente.`); return; }
+
+                const currentValue = clientData[clientIndex][field];
+                let valueChanged = false;
+                if (type === 'number') { valueChanged = parseFloat(currentValue) !== valueToSave; }
+                else { valueChanged = currentValue != valueToSave; }
+
+                if (validationError || !valueChanged) {
+                     cell.innerHTML = originalHTML;
+                     setTimeout(() => { if(document.body.contains(cell)) { cell.addEventListener('dblclick', (e) => makeCellEditable(e.currentTarget, id), { once: true }); } }, 50);
+                     return;
+                }
+
+                const updatePayload = { [field]: valueToSave };
+                if (field === 'dataEmprestimo' && type === 'date' && !validationError) {
+                    updatePayload.dataVencimento = addOneMonth(valueToSave);
+                }
+                try {
+                    const recordRef = child(emprestimosRef, id);
+                    await update(recordRef, updatePayload);
+                    clientData[clientIndex] = { ...clientData[clientIndex], ...updatePayload };
+                    sortClientDataByDate();
+                    renderTable();
+                    updateAllDynamicSections();
+                } catch (e) {
+                    console.error("[FRONTEND][saveEdit] Erro no Firebase update:", e);
+                    alert(`Falha ao salvar no Firebase: ${e.message}`);
+                    cell.innerHTML = originalHTML;
+                     setTimeout(() => { if(document.body.contains(cell)) { cell.addEventListener('dblclick', (ev) => makeCellEditable(ev.currentTarget, id), { once: true }); } }, 50);
+                }
+            }
+
+             async function handleCheckboxChange(event, id) {
+                 const isChecked = event.target.checked;
+                 const idx = clientData.findIndex(c => c && c.id === id);
+                 if(idx === -1) return;
+                 const row = event.target.closest('tr');
+                 try {
+                     const recordRef = child(emprestimosRef, id);
+                     await update(recordRef, { pago: isChecked });
+                     clientData[idx].pago = isChecked;
+                     if(row) { row.style.transition='opacity 0.4s ease, filter 0.4s ease'; row.style.opacity=isChecked ? 0.6 : 1; row.style.filter = isChecked ? 'grayscale(60%)' : 'none'; }
+                     sortClientDataByDate();
+                     updateAllDynamicSections();
+                 } catch (e) {
+                     console.error("[FRONTEND] Erro handleCheckbox Firebase:", e);
+                     alert(`Falha ao atualizar status no Firebase: ${e.message}`);
+                     event.target.checked = !isChecked;
+                     if(row){ row.style.opacity = !isChecked ? 0.6 : 1; row.style.filter = !isChecked ? 'grayscale(60%)' : 'none';}
+                 }
+             }
+
+             async function addNewClient() {
+                 const date = new Date().toISOString().split('T')[0];
+                 const dueDate = addOneMonth(date);
+                 const newData = {
+                     nome: `Explorador #${Math.floor(Math.random()*1000)}`,
+                     valorEmprestimo: 0,
+                     jurosDinheiro: 0,
+                     dataEmprestimo: date,
+                     dataVencimento: dueDate,
+                     pago: false
+                 };
+                 try {
+                     const newRecordRef = await push(emprestimosRef, newData);
+                     const newId = newRecordRef.key;
+                     clientData.push({ ...newData, id: newId });
+                     sortClientDataByDate();
+                     renderTable();
+                     updateAllDynamicSections();
+                     setTimeout(()=>{
+                         const nR = tableBody.querySelector(`tr[data-id='${newId}']`);
+                         if(nR){
+                             nR.scrollIntoView({behavior:'smooth', block:'center'});
+                             const cell = nR.querySelector('td[data-field="nome"]');
+                             if(cell) setTimeout(() => makeCellEditable(cell, newId), 100);
+                         }
+                     }, 300);
+                 } catch (e) {
+                     console.error("[FRONTEND] Erro addNewClient Firebase:", e);
+                     alert(`Falha ao adicionar no Firebase: ${e.message}`);
+                 }
+             }
+
+             function showDeleteConfirmation(id) { const c=clientData.find(cl=>cl&&cl.id===id); if(!c) return; loanIdToDelete=id; if (modalMessage) modalMessage.innerHTML=`Ejetar missão de <strong>${c.nome||'S/N'}</strong> (ID Sonda: ${id.substring(0,8)}...)? <br><strong>Ação irreversível!</strong>`; if (confirmDeleteOverlay) confirmDeleteOverlay.classList.add('active'); }
+             function hideConfirmationModal() { if (confirmDeleteOverlay) confirmDeleteOverlay.classList.remove('active'); loanIdToDelete=null; }
+
+             async function executeDelete() {
+                 if(!loanIdToDelete) return;
+                 const id = loanIdToDelete;
+                 const row = tableBody.querySelector(`tr[data-id='${id}']`);
+                 if(confirmDeleteBtn) { confirmDeleteBtn.textContent='Ejetando...'; confirmDeleteBtn.disabled=true; }
+                 if(cancelDeleteBtn) cancelDeleteBtn.disabled=true;
+                 try {
+                     const recordRef = child(emprestimosRef, id);
+                     await remove(recordRef);
+                     const updateUI = () => {
+                         clientData = clientData.filter(c => c && c.id !== id);
+                         sortClientDataByDate();
+                         renderTable();
+                         updateAllDynamicSections();
+                     };
+                     if(row){
+                         row.classList.remove('visible');
+                         row.classList.add('row-exiting','hidden');
+                         setTimeout(updateUI, 400);
+                     } else {
+                         updateUI();
+                     }
+                     hideConfirmationModal();
+                 } catch(e) {
+                     console.error("[FRONTEND] Erro executeDelete Firebase:", e);
+                     alert(`Falha ao ejetar no Firebase: ${e.message}`);
+                     if(row) row.classList.remove('row-exiting','hidden');
+                 } finally {
+                     if(confirmDeleteBtn) { confirmDeleteBtn.textContent='Sim, Ejetar!'; confirmDeleteBtn.disabled=false; }
+                     if(cancelDeleteBtn) cancelDeleteBtn.disabled=false;
+                 }
+             }
+
+             async function loadInitialData() {
+                 if (!tableBody) { return; }
+                 tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:30px; color:#C4B5FD;">🛰️ Escaneando quadrante financeiro...</td></tr>';
+                 clientData = [];
+                 try {
+                     const snapshot = await get(emprestimosRef);
+                     if (snapshot.exists()) {
+                         const dataFromFirebase = snapshot.val();
+                         clientData = Object.entries(dataFromFirebase).map(([key, value]) => {
+                             if (!value || typeof value !== 'object') { return null; }
+                             return {
+                                 id: key, nome: String(value.nome || 'S/N'),
+                                 valorEmprestimo: parseFloat(value.valorEmprestimo) || 0,
+                                 jurosDinheiro: parseFloat(value.jurosDinheiro) || 0,
+                                 dataEmprestimo: value.dataEmprestimo || '',
+                                 dataVencimento: value.dataVencimento || '',
+                                 pago: value.pago === true || String(value.pago).toLowerCase() === 'true' || value.pago === 1
+                             };
+                         }).filter(item => item !== null);
+                         sortClientDataByDate();
+                     } else { clientData = []; }
+                 } catch (error) {
+                     console.error("==== [FRONTEND] ERRO CATCH em loadInitialData (Firebase) ====", error);
+                     clientData = [];
+                     if (tableBody) { tableBody.innerHTML = `<tr><td colspan="10" style="color:#F87171; text-align:center; padding:2rem;">❌ Falha na comunicação com a base estelar: ${error.message}.<br>Verifique o Console de Comando (F12) e os protocolos de segurança Firebase.</td></tr>`; }
+                 } finally {
+                     renderTable();
+                     try { updateAllDynamicSections(); } catch(eUpdate) { console.error("[FRONTEND] Erro durante updateAllDynamicSections no finally:", eUpdate); }
+                 }
+             }
+
+            if (addClientBtn) { addClientBtn.addEventListener('click', addNewClient); } else { console.warn("[FRONTEND] Elemento #addClientBtn não encontrado."); }
+            if (confirmDeleteBtn) { confirmDeleteBtn.addEventListener('click', executeDelete); } else { console.warn("[FRONTEND] Elemento #confirmDeleteBtn não encontrado."); }
+            if (cancelDeleteBtn) { cancelDeleteBtn.addEventListener('click', hideConfirmationModal); } else { console.warn("[FRONTEND] Elemento #cancelDeleteBtn não encontrado."); }
+            if (confirmDeleteOverlay) { confirmDeleteOverlay.addEventListener('click', (e)=>{ if(e.target===confirmDeleteOverlay) { hideConfirmationModal();} }); } else { console.warn("[FRONTEND] Elemento #confirmDeleteOverlay não encontrado."); }
+
+            loadInitialData();
+
+            // Mouse move listener is not strictly necessary for theme but kept if desired
+            // const body = document.body; window.addEventListener('mousemove', (e) => { const x=(e.clientX/window.innerWidth)*100; const y=(e.clientY/window.innerHeight)*100; body.style.setProperty('--x', `${x}%`); body.style.setProperty('--y', `${y}%`); }, { passive: true });
+
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinançApp - Sua Galáxia Financeira Pessoal</title>
+    <!-- Links Externos (CDNs) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Fonts: Inter e Orbitron -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Seu CSS Local -->
+    <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+    <!-- Container para Elementos de Fundo Animados -->
+    <div id="animated-background-container">
+        <div id="starry-sky-backdrop"></div>
+        <div id="rising-galactic-cloud"></div>
+        <div id="saturn-planet-container">
+            <div id="saturn-rings"></div>
+            <div id="saturn-body"></div>
+        </div>
+        <div id="atmospheric-clouds-container">
+            <div class="atmospheric-cloud" id="cloud1"></div>
+            <div class="atmospheric-cloud" id="cloud2"></div>
+            <div class="atmospheric-cloud" id="cloud3"></div>
+        </div>
+    </div>
+
+    <!-- Wrapper para todo o conteúdo principal da página -->
+    <div id="page-content-wrapper">
+        <!-- Navigation -->
+        <nav id="navbar">
+            <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-5">
+                <a href="#" class="flex items-center">
+                    <i class="fas fa-wallet text-3xl text-purple-400 mr-2"></i>
+                    <span class="text-xl font-orbitron font-bold text-white">Finanç<span class="text-purple-400">App</span></span>
+                </a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="nav-link font-inter">Recursos</a>
+                    <a href="#how-it-works" class="nav-link font-inter">Como Funciona</a>
+                    <a href="#pricing" class="nav-link font-inter">Planos</a>
+                    <a href="#testimonials" class="nav-link font-inter">Depoimentos</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="hidden md:inline-block nav-link text-sm font-inter">Entrar</a>
+                    <a href="#" class="btn btn-primary text-sm font-inter">Decole Grátis</a>
+                    <button id="mobile-menu-button" class="md:hidden text-neutral-300 hover:text-purple-400">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+             <div id="mobile-menu" class="md:hidden absolute top-full left-0 right-0 bg-[rgba(10,10,15,0.95)] backdrop-blur-md border-t border-b border-neutral-700/50 p-4 hidden">
+                <nav class="flex flex-col space-y-3">
+                    <a href="#features" class="nav-link block py-2 text-center font-inter">Recursos</a>
+                    <a href="#how-it-works" class="nav-link block py-2 text-center font-inter">Como Funciona</a>
+                    <a href="#pricing" class="nav-link block py-2 text-center font-inter">Planos</a>
+                    <a href="#testimonials" class="nav-link block py-2 text-center font-inter">Depoimentos</a>
+                    <hr class="border-neutral-700 my-2">
+                    <a href="#" class="nav-link block py-2 text-center text-sm font-inter">Entrar</a>
+                    <a href="#" class="btn btn-primary block w-full text-center mt-2 text-sm font-inter">Decole Grátis</a>
+                </nav>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="min-h-screen flex items-center justify-center text-center py-20 pt-32 md:pt-20 relative overflow-hidden">
+            <div class="max-w-3xl mx-auto px-4 scroll-animate">
+                <div class="font-inter inline-block bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-full mb-8 tracking-wider">
+                    <i class="fas fa-rocket mr-2"></i>Sua Jornada para a Liberdade Financeira Começa Aqui
+                </div>
+                <h1 class="font-inter text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-8 leading-tight tracking-tighter sm:tracking-tight">
+                    Desvende o Universo das suas Finanças com <span class="text-purple-400">Poder</span> e <span class="text-blue-400">Simplicidade</span>.
+                </h1>
+                <p class="font-inter text-lg sm:text-xl text-neutral-300 mb-12 max-w-xl mx-auto leading-relaxed">
+                    Com o FinançApp, você transforma o caos financeiro em clareza cósmica. Gerencie, invista e veja seu patrimônio decolar com ferramentas inteligentes e uma experiência intuitiva.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="#" class="btn btn-primary w-full sm:w-auto animate-pulse-custom text-base font-semibold">Inicie sua Missão Financeira Grátis</a>
+                    <a href="#" class="btn btn-outline w-full sm:w-auto text-base font-semibold">
+                        <i class="fas fa-play-circle mr-2"></i>Explorar a Plataforma
+                    </a>
+                </div>
+                <div class="mt-12 flex justify-center items-center scroll-animate" style="transition-delay: 0.2s;">
+                    <div class="flex -space-x-3">
+                        <img src="https://randomuser.me/api/portraits/women/12.jpg" class="w-10 h-10 rounded-full border-2 border-purple-500 shadow-md" alt="User">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-10 h-10 rounded-full border-2 border-purple-500 shadow-md" alt="User">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-10 h-10 rounded-full border-2 border-purple-500 shadow-md" alt="User">
+                    </div>
+                    <span class="ml-4 text-sm text-neutral-400 font-inter">+5.000 exploradores financeiros a bordo</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-20">
+            <div class="max-w-6xl mx-auto px-4 scroll-animate stagger-children">
+                <div class="text-center mb-16">
+                    <span class="font-inter inline-block px-3 py-1 bg-purple-500/10 text-purple-300 rounded-full text-sm font-semibold mb-4 uppercase tracking-wider">FERRAMENTAS DE NAVEGAÇÃO</span>
+                    <h2 class="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 section-title-glow tracking-wide">
+                        Comande suas Finanças com Precisão Estelar
+                    </h2>
+                    <p class="font-inter text-lg text-neutral-300 max-w-3xl mx-auto leading-relaxed">
+                        Descubra como cada recurso do FinançApp é projetado para iluminar seu caminho financeiro e impulsionar seus resultados.
+                    </p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="content-card stagger-item" style="transition-delay: 0s;"><div class="feature-icon-animate text-purple-400 text-3xl mb-4"><i class="fas fa-chart-pie"></i></div><h3 class="font-orbitron text-xl lg:text-2xl font-bold text-white mb-3 tracking-normal">Orçamentos Inteligentes</h3><p class="font-inter text-neutral-400 text-sm leading-relaxed">Crie planos de gastos que se adaptam à sua vida e receba insights para otimizar cada real. Seu futuro financeiro, planejado.</p></div>
+                    <div class="content-card stagger-item" style="transition-delay: 0.1s;"><div class="feature-icon-animate text-blue-400 text-3xl mb-4"><i class="fas fa-link"></i></div><h3 class="font-orbitron text-xl lg:text-2xl font-bold text-white mb-3 tracking-normal">Conexão Universal</h3><p class="font-inter text-neutral-400 text-sm leading-relaxed">Sincronize todas as suas contas e cartões em um só lugar. Tenha uma visão 360º da sua galáxia financeira, automaticamente.</p></div>
+                    <div class="content-card stagger-item" style="transition-delay: 0.2s;"><div class="feature-icon-animate text-purple-400 text-3xl mb-4"><i class="fas fa-bullseye-arrow"></i></div><h3 class="font-orbitron text-xl lg:text-2xl font-bold text-white mb-3 tracking-normal">Metas Astrais</h3><p class="font-inter text-neutral-400 text-sm leading-relaxed">Defina seus sonhos financeiros, de pequenas economias a grandes conquistas, e trace a rota para alcançá-los com clareza.</p></div>
+                    <div class="content-card stagger-item" style="transition-delay: 0.3s;"><div class="feature-icon-animate text-blue-400 text-3xl mb-4"><i class="fas fa-file-invoice-dollar"></i></div><h3 class="font-orbitron text-xl lg:text-2xl font-bold text-white mb-3 tracking-normal">Relatórios Galácticos</h3><p class="font-inter text-neutral-400 text-sm leading-relaxed">Entenda seus padrões de gastos e receitas com gráficos e relatórios visuais que transformam dados em decisões inteligentes.</p></div>
+                    <div class="content-card stagger-item" style="transition-delay: 0.4s;">
+                        <div class="feature-icon-animate text-purple-400 text-3xl mb-4"><i class="fas fa-user-shield"></i></div>
+                        <h3 class="font-orbitron text-xl lg:text-2xl font-bold text-white mb-3 tracking-normal">Segurança Constelar</h3>
+                        <p class="font-inter text-neutral-400 text-sm leading-relaxed mb-4">Sua tranquilidade é nossa prioridade. Protegemos seus dados com criptografia de nível bancário e segurança multicamadas.</p>
+                        <a href="#security-details-fake" class="font-inter text-sm text-purple-400 hover:text-purple-300 hover:underline transition-colors duration-200">
+                            Conheça nossa fortaleza <i class="fas fa-arrow-right text-xs ml-1"></i>
+                        </a>
+                    </div>
+                    <div class="content-card stagger-item" style="transition-delay: 0.5s;"><div class="feature-icon-animate text-blue-400 text-3xl mb-4"><i class="fas fa-rocket"></i></div><h3 class="font-orbitron text-xl lg:text-2xl font-bold text-white mb-3 tracking-normal">Acesso Multiplataforma</h3><p class="font-inter text-neutral-400 text-sm leading-relaxed">Suas finanças na palma da sua mão ou na tela do seu computador. Acesse o FinançApp de onde estiver, quando precisar.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="py-20 bg-black/20 scroll-animate stagger-children">
+             <div class="max-w-6xl mx-auto px-4">
+                 <div class="text-center mb-16">
+                     <span class="font-inter inline-block px-3 py-1 bg-purple-500/10 text-purple-300 rounded-full text-sm font-semibold mb-4 uppercase tracking-wider">GUIA DE NAVEGAÇÃO RÁPIDA</span>
+                     <h2 class="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 section-title-glow tracking-wide">
+                        Decole para o Controle Financeiro em 3...2...1!
+                    </h2>
+                 </div>
+                 <div class="grid md:grid-cols-3 gap-8 text-center">
+                     <div class="stagger-item" style="transition-delay: 0s;"><div class="content-card p-8"><div class="bg-purple-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-6 text-xl font-bold font-orbitron">1</div><h3 class="font-orbitron text-xl font-bold text-white mb-3">Crie sua Plataforma</h3><p class="font-inter text-neutral-400 text-sm leading-relaxed">Um cadastro rápido e seguro para iniciar sua jornada. Sem asteroides burocráticos.</p></div></div>
+                     <div class="stagger-item" style="transition-delay: 0.1s;"><div class="content-card p-8"><div class="bg-purple-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-6 text-xl font-bold font-orbitron">2</div><h3 class="font-orbitron text-xl font-bold text-white mb-3">Conecte seu Universo</h3><p class="font-inter text-neutral-400 text-sm leading-relaxed">Sincronize contas ou adicione dados manualmente. Você no comando da sua constelação financeira.</p></div></div>
+                     <div class="stagger-item" style="transition-delay: 0.2s;"><div class="content-card p-8"><div class="bg-purple-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-6 text-xl font-bold font-orbitron">3</div><h3 class="font-orbitron text-xl font-bold text-white mb-3">Domine a Galáxia</h3><p class="font-inter text-neutral-400 text-sm leading-relaxed">Monitore, planeje e conquiste seus objetivos. O poder financeiro, agora ao seu alcance.</p></div></div>
+                 </div>
+                 <div class="text-center mt-12"><a href="#" class="btn btn-primary text-lg font-semibold">Pronto para o Lançamento? Comece Agora!</a></div>
+             </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="py-20 scroll-animate stagger-children">
+             <div class="max-w-6xl mx-auto px-4">
+                 <div class="text-center mb-16">
+                     <span class="font-inter inline-block px-3 py-1 bg-purple-500/10 text-purple-300 rounded-full text-sm font-semibold mb-4 uppercase tracking-wider">PLANOS DE VOO FINANCEIRO</span>
+                     <h2 class="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 section-title-glow tracking-wide">Escolha a Missão Ideal para Você</h2>
+                     <p class="font-inter text-lg text-neutral-400 max-w-3xl mx-auto leading-relaxed">Planos flexíveis para cada etapa da sua jornada. Comece gratuitamente e evolua conforme suas necessidades.</p>
+                 </div>
+                 <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                     <div class="content-card p-8 stagger-item" style="transition-delay: 0s;"><h3 class="font-orbitron text-2xl font-bold text-purple-300 mb-3">Explorador</h3><div class="mb-5"><span class="font-inter text-4xl font-bold text-white">R$0</span><span class="font-inter text-neutral-400 text-sm">/mês</span></div><p class="font-inter text-neutral-400 text-sm mb-6 leading-relaxed">Para quem está começando a mapear suas finanças.</p><ul class="font-inter space-y-2.5 text-sm mb-8 text-neutral-300"><li class="flex items-center"><i class="fas fa-check-circle text-green-400 mr-2"></i>Até 2 contas</li><li class="flex items-center"><i class="fas fa-check-circle text-green-400 mr-2"></i>Orçamento básico</li><li class="flex items-center text-neutral-500"><i class="fas fa-times-circle mr-2"></i>Sem integrações</li></ul><a href="#" class="btn btn-outline block w-full text-center text-sm font-semibold">Iniciar como Explorador</a></div>
+                     <div class="content-card p-8 border-2 border-purple-500 shadow-purple-500/40 relative stagger-item" style="transition-delay: 0.1s; transform: scale(1.05);"><div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full font-inter uppercase tracking-wider">MAIS POPULAR</div><h3 class="font-orbitron text-2xl font-bold text-purple-300 mb-3 mt-3">Navegador Pro</h3><div class="mb-5"><span class="font-inter text-4xl font-bold text-white">R$19</span><span class="font-inter text-neutral-400 text-sm">/mês</span></div><p class="font-inter text-neutral-400 text-sm mb-6 leading-relaxed">Para quem busca controle total e insights poderosos.</p><ul class="font-inter space-y-2.5 text-sm mb-8 text-neutral-300"><li class="flex items-center"><i class="fas fa-check-circle text-green-400 mr-2"></i>Contas ilimitadas</li><li class="flex items-center"><i class="fas fa-check-circle text-green-400 mr-2"></i>Integrações automáticas</li><li class="flex items-center"><i class="fas fa-check-circle text-green-400 mr-2"></i>Metas avançadas</li><li class="flex items-center"><i class="fas fa-check-circle text-green-400 mr-2"></i>Relatórios PRO</li></ul><a href="#" class="btn btn-primary block w-full text-center text-sm font-semibold">Assinar Plano Navegador</a></div>
+                     <div class="content-card p-8 stagger-item" style="transition-delay: 0.2s;"><h3 class="font-orbitron text-2xl font-bold text-purple-300 mb-3">Esquadrão Familiar</h3><div class="mb-5"><span class="font-inter text-4xl font-bold text-white">R$29</span><span class="font-inter text-neutral-400 text-sm">/mês</span></div><p class="font-inter text-neutral-400 text-sm mb-6 leading-relaxed">Finanças coordenadas para toda a sua tripulação.</p><ul class="font-inter space-y-2.5 text-sm mb-8 text-neutral-300"><li class="flex items-center"><i class="fas fa-check-circle text-green-400 mr-2"></i>Todos os recursos PRO</li><li class="flex items-center"><i class="fas fa-check-circle text-green-400 mr-2"></i>Até 5 membros</li><li class="flex items-center"><i class="fas fa-check-circle text-green-400 mr-2"></i>Contas compartilhadas</li></ul><a href="#" class="btn btn-outline block w-full text-center text-sm font-semibold">Montar Esquadrão</a></div>
+                 </div>
+             </div>
+        </section>
+
+        <section id="testimonials" class="py-20 bg-black/20 scroll-animate stagger-children">
+             <div class="max-w-6xl mx-auto px-4">
+                 <div class="text-center mb-16">
+                     <span class="font-inter inline-block px-3 py-1 bg-purple-500/10 text-purple-300 rounded-full text-sm font-semibold mb-4 uppercase tracking-wider">RELATOS DE EXPLORADORES</span>
+                     <h2 class="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 section-title-glow tracking-wide">O que Nossos Navegadores Conquistaram</h2>
+                 </div>
+                 <div class="grid md:grid-cols-3 gap-8">
+                     <div class="content-card stagger-item" style="transition-delay: 0s;"><div class="flex items-center mb-4"><img src="https://randomuser.me/api/portraits/women/43.jpg" class="w-12 h-12 rounded-full mr-4 border-2 border-purple-400" alt="User"><div><h4 class="font-inter font-semibold text-white text-lg">Ana Carolina</h4><span class="font-inter text-neutral-400 text-xs">Designer Cósmica</span></div></div><p class="font-inter text-neutral-300 text-sm mb-4 leading-relaxed">"O FinançApp me deu a visão de um telescópio para minhas finanças! Em meses, economizei o suficiente para uma viagem interplanetária (de férias)."</p><div class="flex text-yellow-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div></div>
+                     <div class="content-card stagger-item" style="transition-delay: 0.1s;"><div class="flex items-center mb-4"><img src="https://randomuser.me/api/portraits/men/65.jpg" class="w-12 h-12 rounded-full mr-4 border-2 border-purple-400" alt="User"><div><h4 class="font-inter font-semibold text-white text-lg">Ricardo Almeida</h4><span class="font-inter text-neutral-400 text-xs">Engenheiro de Foguetes (Financeiros)</span></div></div><p class="font-inter text-neutral-300 text-sm mb-4 leading-relaxed">"A integração com os bancos é de outro mundo! Não perco mais tempo com lançamentos manuais. Tudo na velocidade da luz!"</p><div class="flex text-yellow-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div></div>
+                     <div class="content-card stagger-item" style="transition-delay: 0.2s;"><div class="flex items-center mb-4"><img src="https://randomuser.me/api/portraits/women/22.jpg" class="w-12 h-12 rounded-full mr-4 border-2 border-purple-400" alt="User"><div><h4 class="font-inter font-semibold text-white text-lg">Juliana Santos</h4><span class="font-inter text-neutral-400 text-xs">Médica das Estrelas</span></div></div><p class="font-inter text-neutral-300 text-sm mb-4 leading-relaxed">"As metas financeiras me ajudaram a juntar poeira estelar (dinheiro) para a minha nave (casa) dos sonhos. Recomendo a todos os viajantes!"</p><div class="flex text-yellow-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div></div>
+                 </div>
+             </div>
+        </section>
+
+        <section class="py-24 text-center scroll-animate">
+             <div class="max-w-3xl mx-auto px-4">
+                 <div class="mb-8"><i class="fas fa-wallet text-6xl text-purple-400 animate-pulse"></i></div>
+                 <h2 class="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 tracking-wide">
+                    Pronto para Transformar sua Realidade Financeira?
+                </h2>
+                 <p class="font-inter text-lg text-neutral-300 mb-10 leading-relaxed">
+                    Junte-se a milhares de exploradores que já estão mapeando o caminho para um futuro próspero com o FinançApp. Sua aventura começa agora.
+                </p>
+                 <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                     <a href="#" class="btn btn-primary w-full sm:w-auto text-lg px-8 py-3 animate-pulse-custom font-semibold">Decolar Agora (14 Dias Grátis)</a>
+                     <a href="#" class="btn btn-outline w-full sm:w-auto text-lg px-8 py-3 font-semibold">Fale com a Central de Comando</a>
+                 </div>
+             </div>
+        </section>
+
+        <footer class="bg-black/50 border-t border-neutral-800/70 py-16 text-center md:text-left font-inter scroll-animate">
+            <div class="max-w-6xl mx-auto px-4">
+                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+                     <div class="md:col-span-1"><a href="#" class="flex items-center justify-center md:justify-start mb-4"><i class="fas fa-wallet text-3xl text-purple-400 mr-2"></i><span class="text-xl font-orbitron font-bold text-white">Finanç<span class="text-purple-400">App</span></span></a><p class="text-sm text-neutral-400 leading-relaxed">Sua bússola no universo das finanças pessoais.</p></div>
+                     <div><h4 class="font-orbitron font-semibold text-white text-lg mb-4">Produto</h4><ul class="space-y-2 text-sm"><a href="#" class="text-neutral-400 hover:text-purple-300">Recursos</a></li><li><a href="#" class="text-neutral-400 hover:text-purple-300">Planos</a></li><li><a href="#" class="text-neutral-400 hover:text-purple-300">Integrações</a></li></ul></div>
+                     <div><h4 class="font-orbitron font-semibold text-white text-lg mb-4">Suporte</h4><ul class="space-y-2 text-sm"><a href="#" class="text-neutral-400 hover:text-purple-300">Ajuda</a></li><li><a href="#" class="text-neutral-400 hover:text-purple-300">Blog</a></li><li><a href="#" class="text-neutral-400 hover:text-purple-300">Contato</a></li></ul></div>
+                     <div><h4 class="font-orbitron font-semibold text-white text-lg mb-4">Legal</h4><ul class="space-y-2 text-sm"><a href="#" class="text-neutral-400 hover:text-purple-300">Privacidade</a></li><li><a href="#" class="text-neutral-400 hover:text-purple-300">Termos</a></li><li><a href="#" class="text-neutral-400 hover:text-purple-300">Segurança</a></li></ul></div>
+                 </div>
+                 <div class="border-t border-neutral-700/50 pt-8 flex flex-col md:flex-row justify-between items-center"><p class="text-xs text-neutral-500 mb-4 md:mb-0">© 2024 FinançApp Stellar Solutions. Todos os direitos reservados.</p><div class="flex space-x-5"><a href="#" class="text-neutral-500 hover:text-purple-400"><i class="fab fa-facebook-f"></i></a><a href="#" class="text-neutral-400 hover:text-purple-400"><i class="fab fa-twitter"></i></a><a href="#" class="text-neutral-400 hover:text-purple-400"><i class="fab fa-instagram"></i></a><a href="#" class="text-neutral-400 hover:text-purple-400"><i class="fab fa-linkedin-in"></i></a></div></div>
+            </div>
+        </footer>
+    </div> <!-- Fim do #page-content-wrapper -->
+
+    <!-- NOVO: CTA Fixo Flutuante -->
+    <a href="#" id="fixed-cta-button" class="btn btn-primary fixed bottom-6 right-6 p-3 shadow-xl rounded-full hidden opacity-0 transform translate-y-4 transition-all duration-300 ease-out items-center justify-center animate-pulse-custom" style="width: 60px; height: 60px;">
+        <i class="fas fa-rocket text-xl"></i>
+        <span class="sr-only">Decolar Grátis</span>
+    </a>
+
+    <script src="landing.js"></script>
+</body>
+</html>
